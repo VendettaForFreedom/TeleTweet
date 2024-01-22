@@ -132,13 +132,13 @@ def user_check(func):
 def send_message(message):
     feedback = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nکانال و توییتر:\n@FreeVPNHomes\nhttps://twitter.com/FreeVPNHomes"
     today_config = "کانفیگ های امروز"
-    sign = """\n\n@FreeVPNHomes\n\nبه امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
+    sign = """\n\nبه امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
     messageNew = bot.send_message(
         CONFIG_CHANNEL_ID, 
         today_config + feedback + sign
     )
-
-    last_message = f""":\nhttps://t.me/FreeVPNHomesConfigs/{messageNew.id}"""
+    time.sleep(1)
+    last_message = f""":\n@FreeVPNHomesConfigs/{messageNew.id}"""
     bot.send_message(
         CHANNEL_ID, 
         today_config + last_message + feedback + sign
