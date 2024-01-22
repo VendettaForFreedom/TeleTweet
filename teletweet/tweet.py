@@ -14,27 +14,25 @@ from typing import Union
 
 import tweepy
 
-from config import CONSUMER_KEY, CONSUMER_SECRET
-from helper import get_auth_data
+from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(filename)s [%(levelname)s]: %(message)s")
 
 
 def __connect_twitter(chat_id: int):
-    auth_data = get_auth_data(chat_id)
     logging.info("Connecting to twitter api...")
     client = tweepy.Client(
         consumer_key=CONSUMER_KEY,
         consumer_secret=CONSUMER_SECRET,
-        access_token=auth_data["ACCESS_KEY"],
-        access_token_secret=auth_data["ACCESS_SECRET"],
+        access_token=ACCESS_KEY,
+        access_token_secret=ACCESS_SECRET,
     )
     api = tweepy.API(
         tweepy.OAuth1UserHandler(
             consumer_key=CONSUMER_KEY,
             consumer_secret=CONSUMER_SECRET,
-            access_token=auth_data["ACCESS_KEY"],
-            access_token_secret=auth_data["ACCESS_SECRET"],
+            access_token=ACCESS_KEY,
+            access_token_secret=ACCESS_SECRET,
         )
     )
     return client, api
@@ -54,9 +52,15 @@ def upload_media(api, pic) -> Union[list, None]:
 def send_tweet(message, pics: Union[list, None] = None) -> dict:
     logging.info("Preparing tweet for...")
     chat_id = message.chat.id
-    text = message.text or message.caption
+    # text = message.text or message.caption
+    text = f"""کانفیگ های امروز:\nhttps://t.me/FreeVPNHomesConfigs/{message.id}"""
+    channel_info = f"""\n\nhttps://t.me/FreeVPNHomes\n\nبه امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
     if not text:
-        text = ""
+        text = channel_info 
+    if len(text) + len(channel_info) > 280:
+        text = channel_info
+    else:
+        text = text + channel_info
     tweet_id = __get_tweet_id_from_reply(message)
     try:
         client, api = __connect_twitter(chat_id)
