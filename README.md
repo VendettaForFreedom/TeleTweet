@@ -4,9 +4,11 @@
 
 Supports Twitter API v2! 🎉🎉🎉🎉🎉🎉
 
-# Public Bot has been discontinued
+# This bot runs perfectly on DartNode!
 
-![](assets/announcement.png)
+<a href="https://dartnode.com/?via=benny"><img src="assets/dartnode.png" width="500px"  alt="DartNode"/></a>
+
+Find out more on [DartNode](https://dartnode.com/?via=benny)
 
 # Features
 
