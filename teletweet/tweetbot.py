@@ -155,7 +155,7 @@ def handle_message(message):
         # to test on the user itself uncomment
         # messageNew = bot.send_message(message.chat.id, part)
         # logging.info(messageNew)
-        if part.len() > 10:
+        if len(part) > 10:
             bot.send_message(CONFIG_CHANNEL_ID, part + sign)
             time.sleep(1)
     
