@@ -138,7 +138,7 @@ def send_message(message):
         today_config + feedback + sign
     )
     time.sleep(1)
-    last_message = f""":\n@FreeVPNHomesConfigs/{messageNew.id}"""
+    last_message = f""":\nhttps://t.me/FreeVPNHomesConfigs/{messageNew.id}"""
     bot.send_message(
         CHANNEL_ID, 
         today_config + last_message + feedback + sign
@@ -155,8 +155,9 @@ def handle_message(message):
         # to test on the user itself uncomment
         # messageNew = bot.send_message(message.chat.id, part)
         # logging.info(messageNew)
-        bot.send_message(CONFIG_CHANNEL_ID, part + sign)
-        time.sleep(1)
+        if part.len() > 10:
+            bot.send_message(CONFIG_CHANNEL_ID, part + sign)
+            time.sleep(1)
     
     result = send_tweet(messageNew)
     notify_result(result, message)
