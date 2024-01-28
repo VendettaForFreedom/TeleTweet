@@ -10,13 +10,14 @@ __author__ = "Benny <benny.think@gmail.com>"
 import logging
 import os
 import tempfile
+import time
 from threading import Lock
 
 import requests
 from pyrogram import Client, enums, filters, types
 from tgbot_ping import get_runtime
 
-from config import APP_HASH, APP_ID, BOT_TOKEN, tweet_format
+from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, tweet_format
 from helper import get_auth_data, sign_in, sign_off
 from tweet import (
     delete_tweet,
@@ -55,6 +56,7 @@ def sign_in_handler(client, message: types.Message):
         bot.send_message(message.chat.id, "You have already signed in, no need to do it again.")
         return
     message.reply_chat_action(enums.ChatAction.TYPING)
+    # msg = "Send auth code to me"
     msg = "Click this [link](https://teletweet.app) to login in you twitter." " When your login in is done, send auth code back to me"
     bot.send_message(message.chat.id, msg, enums.ParseMode.MARKDOWN)
     STEP[message.chat.id] = "sign_in"
@@ -112,8 +114,12 @@ def user_check(func):
     def wrapper(client, message):
         user_id = message.chat.id
         if str(user_id) in ALLOW_USER:
+        # prevent channel messages to be processed
+        # if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID]:
             # check state machien first
             if STEP.get(message.chat.id) == "sign_in":
+                # if sign_in(message.chat.id, message.text) == True:
+                    # bot.send_message(message.chat.id, "Welcome!")
                 try:
                     result = sign_in(message.chat.id, message.text)
                 except Exception as e:
@@ -132,6 +138,38 @@ def user_check(func):
 
     return wrapper
 
+def send_ad_message(message):
+    feedback = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nکانال و توییتر:\n@FreeVPNHomes\nhttps://twitter.com/FreeVPNHomes"
+    today_config = "کانفیگ های امروز"
+    sign = """\n\nبه امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
+    messageNew = bot.send_message(
+        CONFIG_CHANNEL_ID, 
+        today_config + feedback + sign
+    )
+    time.sleep(1)
+    last_message = f""":\nhttps://t.me/FreeVPNHomesConfigs/{messageNew.id}"""
+    bot.send_message(
+        CHANNEL_ID, 
+        today_config + last_message + feedback + sign
+    )
+
+    result = send_tweet(messageNew)
+    notify_result(result, message)
+    return messageNew
+
+def handle_message(message):
+
+    send_ad_message(message)
+    sign = """\n\n@FreeVPNHomes\n\nبه امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
+    text = message.text or message.caption
+    parts = text.split("\n")
+    for part in parts:
+        # to test on the user itself uncomment
+        # messageNew = bot.send_message(message.chat.id, part)
+        # logging.info(messageNew)
+        if len(part) > 10:
+            bot.send_message(CONFIG_CHANNEL_ID, part + sign)
+            time.sleep(1)
 
 @bot.on_message(filters.incoming & filters.text)
 @user_check
@@ -150,9 +188,7 @@ def tweet_text_handler(client, message: types.Message):
         message.reply_text("Do you want to download video or just tweet this?", quote=True, reply_markup=markup)
         return
 
-    result = send_tweet(message)
-    notify_result(result, message)
-
+    handle_message(message)
 
 @bot.on_message(filters.media_group)
 @user_check
@@ -174,6 +210,7 @@ def tweet_group_photo_handler(client, message: types.Message):
         if caption:
             setattr(message, "text", caption)
         files.append(img_data)
+    # handle_message(message)
     result = send_tweet(message, files)
     notify_result(result, message)
     STEP.pop(media_group_id)
@@ -186,6 +223,7 @@ def tweet_single_photo_handler(client, message: types.Message):
     logging.info("Normal one media message")
     img_data = message.download(in_memory=True)
     setattr(img_data, "mode", "rb")
+    # handle_message(message)
     result = send_tweet(message, [img_data])
     notify_result(result, message)
 
@@ -201,6 +239,7 @@ def notify_result(result, message: types.Message):
 
 @bot.on_callback_query(filters.regex("tweet"))
 def tweet_callback(client, call: types.CallbackQuery):
+    # handle_message(call.message)
     result = send_tweet(call.message.reply_to_message)
     notify_result(result, call.message)
 
