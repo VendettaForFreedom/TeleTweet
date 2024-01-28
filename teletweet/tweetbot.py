@@ -56,7 +56,8 @@ def sign_in_handler(client, message: types.Message):
         bot.send_message(message.chat.id, "You have already signed in, no need to do it again.")
         return
     message.reply_chat_action(enums.ChatAction.TYPING)
-    msg = "Send auth code to me"
+    # msg = "Send auth code to me"
+    msg = "Click this [link](https://teletweet.app) to login in you twitter." " When your login in is done, send auth code back to me"
     bot.send_message(message.chat.id, msg, enums.ParseMode.MARKDOWN)
     STEP[message.chat.id] = "sign_in"
 
@@ -112,13 +113,19 @@ def delete_handler(client, message: types.Message):
 def user_check(func):
     def wrapper(client, message):
         user_id = message.chat.id
+        if str(user_id) in ALLOW_USER:
         # prevent channel messages to be processed
-        if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID]:
+        # if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID]:
             # check state machien first
             if STEP.get(message.chat.id) == "sign_in":
-                if sign_in(message.chat.id, message.text) == True:
-                    bot.send_message(message.chat.id, "Welcome!")
-                    STEP.pop(message.chat.id)
+                # if sign_in(message.chat.id, message.text) == True:
+                    # bot.send_message(message.chat.id, "Welcome!")
+                try:
+                    result = sign_in(message.chat.id, message.text)
+                except Exception as e:
+                    result = str(e)
+                message.reply_text(result, quote=True)
+                STEP.pop(message.chat.id)
                 return
             elif not get_auth_data(message.chat.id):
                 logging.warning("Invalid user %d", message.chat.id)
@@ -126,10 +133,12 @@ def user_check(func):
                 bot.send_message(message.chat.id, "Sorry, I can't find your auth data. Type /sign_in to try again.")
                 return
             return func(client, message)
+        else:
+            bot.send_message(message.chat.id, "You're not allowed to use this bot.")
 
     return wrapper
 
-def send_message(message):
+def send_ad_message(message):
     feedback = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nکانال و توییتر:\n@FreeVPNHomes\nhttps://twitter.com/FreeVPNHomes"
     today_config = "کانفیگ های امروز"
     sign = """\n\nبه امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
@@ -143,11 +152,14 @@ def send_message(message):
         CHANNEL_ID, 
         today_config + last_message + feedback + sign
     )
+
+    result = send_tweet(messageNew)
+    notify_result(result, message)
     return messageNew
 
 def handle_message(message):
 
-    messageNew = send_message(message)
+    send_ad_message(message)
     sign = """\n\n@FreeVPNHomes\n\nبه امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
     text = message.text or message.caption
     parts = text.split("\n")
@@ -158,9 +170,6 @@ def handle_message(message):
         if len(part) > 10:
             bot.send_message(CONFIG_CHANNEL_ID, part + sign)
             time.sleep(1)
-    
-    result = send_tweet(messageNew)
-    notify_result(result, message)
 
 @bot.on_message(filters.incoming & filters.text)
 @user_check

@@ -19,6 +19,6 @@ ACCESS_KEY = os.getenv("ACCESS_KEY", "")
 ACCESS_SECRET = os.getenv("ACCESS_SECRET", "")
 CONFIG_CHANNEL_ID = os.getenv("CONFIG_CHANNEL_ID", "")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
-AUTH_STRING = os.getenv("AUTH_STRING", "")
+# AUTH_STRING = os.getenv("AUTH_STRING", "")
 
 tweet_format = "https://twitter.com/{screen_name}/status/{id}"
