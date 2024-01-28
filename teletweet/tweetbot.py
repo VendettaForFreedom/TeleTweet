@@ -17,7 +17,7 @@ import requests
 from pyrogram import Client, enums, filters, types
 from tgbot_ping import get_runtime
 
-from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, tweet_format
+from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USER, tweet_format
 from helper import get_auth_data, sign_in, sign_off
 from tweet import (
     delete_tweet,
@@ -32,8 +32,6 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(filename)s [%(le
 logging.getLogger("apscheduler.executors.default").propagate = False
 media_group = {}
 bot = Client("teletweet", APP_ID, APP_HASH, bot_token=BOT_TOKEN)
-
-ALLOW_USER = os.getenv("ALLOW_USER", "").split(",")
 
 STEP = {}
 
