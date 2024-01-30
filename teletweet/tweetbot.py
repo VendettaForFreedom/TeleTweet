@@ -112,8 +112,6 @@ def user_check(func):
     def wrapper(client, message):
         user_id = message.chat.id
         if str(user_id) in ALLOW_USER:
-            bot.send_message(message.chat.id, "Welcome!")
-            STEP.pop(message.chat.id)
             return
         else:
             bot.send_message(message.chat.id, "You're not allowed to use this bot.")
