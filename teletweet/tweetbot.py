@@ -112,25 +112,9 @@ def user_check(func):
     def wrapper(client, message):
         user_id = message.chat.id
         if str(user_id) in ALLOW_USER:
-        # prevent channel messages to be processed
-        # if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID]:
-            # check state machien first
-            if STEP.get(message.chat.id) == "sign_in":
-                # if sign_in(message.chat.id, message.text) == True:
-                    # bot.send_message(message.chat.id, "Welcome!")
-                try:
-                    result = sign_in(message.chat.id, message.text)
-                except Exception as e:
-                    result = str(e)
-                message.reply_text(result, quote=True)
-                STEP.pop(message.chat.id)
-                return
-            elif not get_auth_data(message.chat.id):
-                logging.warning("Invalid user %d", message.chat.id)
-                message.reply_chat_action(enums.ChatAction.TYPING)
-                bot.send_message(message.chat.id, "Sorry, I can't find your auth data. Type /sign_in to try again.")
-                return
-            return func(client, message)
+            bot.send_message(message.chat.id, "Welcome!")
+            STEP.pop(message.chat.id)
+            return
         else:
             bot.send_message(message.chat.id, "You're not allowed to use this bot.")
 
