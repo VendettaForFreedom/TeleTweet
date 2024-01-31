@@ -1,0 +1,53 @@
+name: Deployment Workflow
+
+on:
+  push:
+    branches:
+      - development
+  pull_request:
+    branches:
+      - development
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: your-aws-region
+
+      - name: Check if CloudFormation stack exists
+        id: check-stack
+        run: |
+          stack_name="your-stack-name"
+          if aws cloudformation describe-stacks --stack-name $stack_name 2>/dev/null; then
+            echo "::set-output name=stack_exists::true"
+          else
+            echo "::set-output name=stack_exists::false"
+          fi
+
+      - name: Deploy to S3
+        run: |
+          aws s3 cp .deployment/cloudformation.yml s3://your-s3-bucket/
+          aws s3 cp .deployment/parameters.json s3://your-s3-bucket/
+
+      - name: Deploy CloudFormation stack
+        if: steps.check-stack.outputs.stack_exists == 'true'
+        run: |
+          aws cloudformation update-stack --stack-name your-stack-name \
+            --template-url https://your-s3-bucket.s3.amazonaws.com/cloudformation.yml \
+            --parameters file://.deployment/parameters.json \
+            --capabilities CAPABILITY_IAM
+        else
+          aws cloudformation create-stack --stack-name your-stack-name \
+            --template-url https://your-s3-bucket.s3.amazonaws.com/cloudformation.yml \
+            --parameters file://.deployment/parameters.json \
+            --capabilities CAPABILITY_IAM
+
