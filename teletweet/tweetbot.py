@@ -111,11 +111,12 @@ def delete_handler(client, message: types.Message):
 def user_check(func):
     def wrapper(client, message):
         user_id = message.chat.id
-        if str(user_id) in ALLOW_USER:
-            return wrapper
-        else:
-            bot.send_message(message.chat.id, "You're not allowed to use this bot.")
-            return
+        if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID]:
+            if str(user_id) in ALLOW_USER:
+                return func(client, message)
+            else:
+                bot.send_message(message.chat.id, "You're not allowed to use this bot.")
+                return
     return wrapper
 
 def send_ad_message(message):
@@ -133,8 +134,8 @@ def send_ad_message(message):
         today_config + last_message + feedback + sign
     )
 
-    result = send_tweet(messageNew)
-    notify_result(result, message)
+    # result = send_tweet(messageNew)
+    # notify_result(result, message)
     return messageNew
 
 def handle_message(message):
