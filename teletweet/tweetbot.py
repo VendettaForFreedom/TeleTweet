@@ -112,10 +112,10 @@ def user_check(func):
     def wrapper(client, message):
         user_id = message.chat.id
         if str(user_id) in ALLOW_USER:
-            return func(client, message)
+            return wrapper
         else:
             bot.send_message(message.chat.id, "You're not allowed to use this bot.")
-
+            return
     return wrapper
 
 def send_ad_message(message):
