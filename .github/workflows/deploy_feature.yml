@@ -36,7 +36,7 @@ jobs:
           full_image_name=${{ vars.DOCKER_IMAGE }}:feature-${{ steps.get_latest_tag.outputs.latest_tag }}-${commit_hash}
           echo "full_image_name=${full_image_name}"
           docker build -t ${{vars.DOCKER_IMAGE}}:latest .
-          docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
+          docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}"" -p "${{ secrets.DOCKER_HUB_PASSWORD }}"
           docker tag  ${{vars.DOCKER_IMAGE}}:latest ${full_image_name}
           docker push ${full_image_name}
           echo "DEPLOYED_DOCKER_IMAGE=${full_image_name}" >> env/teletweet.env
