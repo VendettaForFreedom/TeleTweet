@@ -23,28 +23,28 @@ jobs:
           tags=($(git tag --sort=committerdate))
           if [[ $tags != "" ]] ; then latest_tag=${tags[-1]} ; else latest_tag=V0.0.0 ; fi
           echo ${latest_tag}
-          echo "::set-output name=latest_tag::${latest_tag}"
+          echo "latest_tag=${latest_tag}" >> $GITHUB_OUTPUT
       
-      # - name: Build and Push Docker Image
-      #   id: docker_build
-      #   run: |
-      #     commit_hash=$(git rev-parse --short HEAD)
-      #     echo "docker image name: ${{vars.DOCKER_IMAGE}}"
-      #     full_image_name=${{ vars.DOCKER_IMAGE }}:dev-${{ steps.get_latest_tag.outputs.latest_tag }}-${commit_hash}
-      #     echo "full_image_name=${full_image_name}"
-      #     docker build -t ${{vars.DOCKER_IMAGE}}:latest .
-      #     docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
-      #     docker tag  ${{vars.DOCKER_IMAGE}}:latest ${full_image_name}
-      #     docker push ${full_image_name}
-      #     echo "DEPLOYED_DOCKER_IMAGE=${full_image_name}" >> env/teletweet.env
-      #     echo "::set-output name=full_image_name::${full_image_name}"
+      - name: Build and Push Docker Image
+        id: docker_build
+        run: |
+          commit_hash=$(git rev-parse --short HEAD)
+          echo "docker image name: ${{vars.DOCKER_IMAGE}}"
+          full_image_name=${{ vars.DOCKER_IMAGE }}:feature-${{ steps.get_latest_tag.outputs.latest_tag }}-${commit_hash}
+          echo "full_image_name=${full_image_name}"
+          docker build -t ${{vars.DOCKER_IMAGE}}:latest .
+          docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
+          docker tag  ${{vars.DOCKER_IMAGE}}:latest ${full_image_name}
+          docker push ${full_image_name}
+          echo "DEPLOYED_DOCKER_IMAGE=${full_image_name}" >> env/teletweet.env
+          echo "full_image_name=${full_image_name}" >> $GITHUB_OUTPUT
         
 
-      # - name: create .env file
-      #   run: |
-      #     echo "DEPLOYED_DOCKER_IMAGE=${steps.docker_build.output.full_image_name}" > .env
-      #     echo "showing the content of the .env file:"
-      #     cat .env
+      - name: create .env file
+        run: |
+          echo "DEPLOYED_DOCKER_IMAGE=${steps.docker_build.output.full_image_name}" > .env
+          echo "showing the content of the .env file:"
+          cat .env
 
       # - name: create local env file
       #   run: |
