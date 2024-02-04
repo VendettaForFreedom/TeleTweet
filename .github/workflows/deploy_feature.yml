@@ -1,0 +1,61 @@
+name: deployment Workflow
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - labeled
+  
+
+jobs:
+  build_n_deploy:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.pull_request.head.ref, 'feature-') && github.event.pull_request.base.ref == 'development' && contains(github.event.pull_request.labels.*.name, 'build')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: get the latest tag
+        id: get_latest_tag
+        run: |
+          git fetch --tags
+          tags=($(git tag --sort=committerdate))
+          if [[ $tags != "" ]] ; then latest_tag=${tags[-1]} ; else latest_tag=V0.0.0 ; fi
+          echo ${latest_tag}
+          echo "::set-output name=latest_tag::${latest_tag}"
+      
+      # - name: Build and Push Docker Image
+      #   id: docker_build
+      #   run: |
+      #     commit_hash=$(git rev-parse --short HEAD)
+      #     echo "docker image name: ${{vars.DOCKER_IMAGE}}"
+      #     full_image_name=${{ vars.DOCKER_IMAGE }}:dev-${{ steps.get_latest_tag.outputs.latest_tag }}-${commit_hash}
+      #     echo "full_image_name=${full_image_name}"
+      #     docker build -t ${{vars.DOCKER_IMAGE}}:latest .
+      #     docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
+      #     docker tag  ${{vars.DOCKER_IMAGE}}:latest ${full_image_name}
+      #     docker push ${full_image_name}
+      #     echo "DEPLOYED_DOCKER_IMAGE=${full_image_name}" >> env/teletweet.env
+      #     echo "::set-output name=full_image_name::${full_image_name}"
+        
+
+      # - name: create .env file
+      #   run: |
+      #     echo "DEPLOYED_DOCKER_IMAGE=${steps.docker_build.output.full_image_name}" > .env
+      #     echo "showing the content of the .env file:"
+      #     cat .env
+
+      # - name: create local env file
+      #   run: |
+      #     echo "DEPLOYED_DOCKER_IMAGE=${steps.docker_build.output.full_image_name}" > .env
+      #     /bin/bash .ci_utils/create_env_file.sh
+
+      # - name: Deploy to EC2
+      #   run: |
+      #     ssh -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} "mkdir -p ~/teletweet"
+      #     # copy the files to the ec2
+      #     ssh -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no ./* ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} : docker pull ${steps.docker_build.output.full_image_name}
+      #     scp -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no -r ./* ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} : ~/teletweet 
+      #     ssh -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} "cd ~/teletweet && docker-compose up -d"
+
