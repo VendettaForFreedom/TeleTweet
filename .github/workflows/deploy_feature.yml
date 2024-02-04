@@ -49,7 +49,7 @@ jobs:
 
       - name: create .env file
         run: |
-          full_image_name="${{ steps.docker_build.output.full_image_name }}"
+          full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
           echo DEPLOYED_DOCKER_IMAGE=${full_image_name} > .env
           echo "showing the content of the .env file:"
           cat .env
