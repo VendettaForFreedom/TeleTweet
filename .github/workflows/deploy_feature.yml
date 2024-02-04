@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.event.pull_request.head.ref, 'feature-') && github.event.pull_request.base.ref == 'development' && contains(github.event.pull_request.labels.*.name, 'build')
 
+    environment: 
+      name: feature
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
