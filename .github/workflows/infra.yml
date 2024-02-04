@@ -7,11 +7,15 @@ on:
       - development
     paths:
     - '.deployment/**'
+    types:
+      - closed
   pull_request:
     branches:
       - development
     paths:
     - '.deployment/**'
+    types:
+      - closed
   
 
 jobs:
