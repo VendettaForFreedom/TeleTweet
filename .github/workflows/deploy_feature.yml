@@ -3,14 +3,18 @@ name: deployment Workflow
 on:
   workflow_dispatch:
   pull_request:
+    branches:
+      - development
     types:
+      - synchronize
       - labeled
+    
   
 
 jobs:
   build_n_deploy:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.pull_request.head.ref, 'feature-') && github.event.pull_request.base.ref == 'development' && contains(github.event.pull_request.labels.*.name, 'build')
+    if: startsWith(github.event.pull_request.head.ref, 'feature-')  && contains(github.event.pull_request.labels.*.name, 'build')
 
     environment: 
       name: feature
@@ -45,12 +49,14 @@ jobs:
 
       - name: create .env file
         run: |
-          echo "DEPLOYED_DOCKER_IMAGE=${steps.docker_build.output.full_image_name}" > .env
+          full_image_name=${{ steps.docker_build.output.full_image_name }}
+          echo "DEPLOYED_DOCKER_IMAGE=full_image_name > .env
           echo "showing the content of the .env file:"
           cat .env
 
       # - name: create local env file
       #   run: |
+
       #     echo "DEPLOYED_DOCKER_IMAGE=${steps.docker_build.output.full_image_name}" > .env
       #     /bin/bash .ci_utils/create_env_file.sh
 
