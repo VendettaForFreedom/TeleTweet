@@ -1,7 +1,7 @@
 if [ -e env/teletweet.env ]; then
     rm env/teletweet.env
 fi
-echo echo TOKEN=${{ secrets.TOKEN}} >> env/teletweet.env
+echo TOKEN=${{ secrets.TOKEN}} >> env/teletweet.env
 echo CONSUMER_KEY=${{ secrets.CONSUMER_KEY}} >> env/teletweet.env
 echo CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET}} >> env/teletweet.env
 echo #CALLBACK_URL=  >> env/teletweet.env
