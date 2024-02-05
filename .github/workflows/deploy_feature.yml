@@ -69,10 +69,12 @@ jobs:
         run: |
           /bin/bash .ci_utils/create_env_file.sh
 
-      - name: Deploy to EC2
+      - name: config ssh
         uses: webfactory/ssh-agent@v0.8.0
         with:
             ssh-private-key: ${{ secrets.secrets.KEY_MANAGED }}
+
+      - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
           # co ec2
