@@ -54,17 +54,15 @@ jobs:
           echo "showing the content of the .env file:"
           cat .env
 
-      # - name: create local env file
-      #   run: |
+      - name: create local env file
+        run: |
+          /bin/bash .ci_utils/create_env_file.sh
 
-      #     echo "DEPLOYED_DOCKER_IMAGE=${steps.docker_build.output.full_image_name}" > .env
-      #     /bin/bash .ci_utils/create_env_file.sh
-
-      # - name: Deploy to EC2
-      #   run: |
-      #     ssh -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} "mkdir -p ~/teletweet"
-      #     # copy the files to the ec2
-      #     ssh -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no ./* ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} : docker pull ${steps.docker_build.output.full_image_name}
-      #     scp -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no -r ./* ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} : ~/teletweet 
-      #     ssh -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} "cd ~/teletweet && docker-compose up -d"
+      - name: Deploy to EC2
+        run: |
+          ssh -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} "mkdir -p ~/teletweet"
+          # copy the files to the ec2
+          ssh -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no ./* ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} : docker pull ${steps.docker_build.output.full_image_name}
+          scp -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no -r ./* ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} : ~/teletweet 
+          ssh -i ${{ secrets.KEY_MANAGED }} -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER xx@xxx secrets.INSTANCE_IP }} "cd ~/teletweet && docker-compose up -d"
 
