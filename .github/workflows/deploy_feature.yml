@@ -78,9 +78,9 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh-keyscan -H ${{ secrets.INSTANCE_IP }} >> ~/.ssh/known_hosts
-          ssh -vvv "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
-          # co ec2
-          ssh -vvv "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" : docker pull ${steps.docker_build.output.full_image_name}
-          scp -vvv -r ./* "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" : ~/teletweet 
-          ssh  -vvv "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose up -d"
+          # ssh -vvv "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
+          # # co ec2
+          # ssh -vvv "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" : docker pull ${steps.docker_build.output.full_image_name}
+          # scp -vvv -r ./* "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" : ~/teletweet 
+          # ssh  -vvv "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose up -d"
 
