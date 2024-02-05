@@ -49,6 +49,17 @@ jobs:
 
       - name: create .env file
         run: |
+          TOKEN=${{ secrets.TOKEN}}
+          CONSUMER_KEY=${{ secrets.CONSUMER_KEY}}
+          CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET}}
+          #CALLBACK_URL=
+          APP_ID=${{ secrets.APP_ID}}
+          APP_HASH=${{ secrets.APP_HASH}}
+          ACCESS_KEY=${{ secrets.ACCESS_KEY}}
+          ACCESS_SECRET=${{ secrets.ACCESS_SECRET}}
+          CONFIG_CHANNEL_ID=${{ secrets.CONFIG_CHANNEL_ID}}
+          CHANNEL_ID=${{ secrets.CHANNEL_ID}}
+          ALLOW_USER=${{ secrets.ALLOW_USER}}
           full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
           echo DEPLOYED_DOCKER_IMAGE=${full_image_name} > .env
           echo "showing the content of the .env file:"
