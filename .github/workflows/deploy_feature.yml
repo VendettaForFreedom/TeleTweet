@@ -71,11 +71,11 @@ jobs:
 
       - name: Deploy to EC2
         uses: webfactory/ssh-agent@v0.8.0
-          with:
-              ssh-private-key: ${{ secrets.secrets.KEY_MANAGED }}
+        with:
+            ssh-private-key: ${{ secrets.secrets.KEY_MANAGED }}
         run: |
           ssh -o StrictHostKeyChecking=no "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
-          # copy the files to the ec2
+          # co ec2
           ssh -o StrictHostKeyChecking=no ./* "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" : docker pull ${steps.docker_build.output.full_image_name}
           scp -o StrictHostKeyChecking=no -r ./* "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" : ~/teletweet 
           ssh -o StrictHostKeyChecking=no "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose up -d"
