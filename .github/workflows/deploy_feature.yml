@@ -85,11 +85,11 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -i ./private.key "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
-          ssh -i ./private.key "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" docker pull ${FULL_DOCKER_IMAGE_NAME}
+          full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
+          echo full_image_name: $full_image_name
+          ssh -i ./private.key "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" docker pull "${full_image_name}"
           scp -i ./private.key -r ./env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
           scp -i ./private.key -r ./teletweet "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
           scp -i ./private.key -r ./docker-compose.yml "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
           scp -i ./private.key -r ./.env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
           # ssh -i ./private.key "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose up -d"
-        env:
-          FULL_DOCKER_IMAGE_NAME: ${{steps.docker_build.output.full_image_name}}
