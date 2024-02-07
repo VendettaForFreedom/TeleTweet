@@ -64,7 +64,7 @@ jobs:
 
       - name: create local env file
         run: |
-          cp create_env_file.sh .
+          cp .ci_utils/create_env_file.sh .
           /bin/bash create_env_file.sh
 
       - name: config ssh
