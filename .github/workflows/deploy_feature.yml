@@ -46,18 +46,18 @@ jobs:
 
       - name: create .env file
         run: |
-          echo TOKEN=${{ secrets.TOKEN}} >> teletweet.env >> teletweet.env
-          CONSUMER_KEY=${{ secrets.CONSUMER_KEY}} >> teletweet.env
-          CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET}} >> teletweet.env
-          #CALLBACK_URL= >> teletweet.env
-          APP_ID=${{ secrets.APP_ID}} >> teletweet.env
-          APP_HASH=${{ secrets.APP_HASH}} >> teletweet.env
-          ACCESS_KEY=${{ secrets.ACCESS_KEY}} >> teletweet.env
-          ACCESS_SECRET=${{ secrets.ACCESS_SECRET}} >> teletweet.env
-          CONFIG_CHANNEL_ID=${{ secrets.CONFIG_CHANNEL_ID}} >> teletweet.env
-          CHANNEL_ID=${{ secrets.CHANNEL_ID}} >> teletweet.env
-          ALLOW_USER=${{ secrets.ALLOW_USER}} >> teletweet.env
-          full_image_name="${{ steps.docker_build.outputs.full_image_name }}" >> teletweet.env
+          echo TOKEN=${{ secrets.TOKEN}} >> teletweet.env
+          echo CONSUMER_KEY=${{ secrets.CONSUMER_KEY}} >> teletweet.env
+          echo CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET}} >> teletweet.env
+          echo #CALLBACK_URL= >> teletweet.env
+          echo APP_ID=${{ secrets.APP_ID}} >> teletweet.env
+          echo APP_HASH=${{ secrets.APP_HASH}} >> teletweet.env
+          echo ACCESS_KEY=${{ secrets.ACCESS_KEY}} >> teletweet.env
+          echo ACCESS_SECRET=${{ secrets.ACCESS_SECRET}} >> teletweet.env
+          echo CONFIG_CHANNEL_ID=${{ secrets.CONFIG_CHANNEL_ID}} >> teletweet.env
+          echo CHANNEL_ID=${{ secrets.CHANNEL_ID}} >> teletweet.env
+          echo ALLOW_USER=${{ secrets.ALLOW_USER}} >> teletweet.env
+          full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
           echo DOCKER_IMAGE_DEPLOYED=${full_image_name} > .env
           echo "showing the content of the .env file:"
           cat .env
