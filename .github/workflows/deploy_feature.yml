@@ -84,14 +84,7 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-
-          echo "$SSH_PRIVATE_KEY" | base64 -d > /opt/id_rsa
-          chmod og= /opt/id_rsa
-          # echo "$ENV_PROD_HETZNER" > /opt/.env && echo "IMAGE=${IMAGE}" >> /opt/.env
-          # scp -i /opt/id_rsa -o StrictHostKeyChecking=no -P 3322 /opt/.env root@94.130.76.17:/opt/docker-compose/servito-app/.env
-          # ssh -i /opt/id_rsa -o StrictHostKeyChecking=no -p 3322 root@94.130.76.17 "cd /opt/docker-compose/servito-app && docker compose pull && docker compose up -d --force-recreate"
-          ssh -i /opt/id_rsa -o StrictHostKeyChecking=no "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
-          #  ssh -i ./private.key "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
+          ssh -vvv -i ./private.key "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
         # ssh -vvv "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
         # # co ec2
         # ssh -vvv "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" : docker pull ${steps.docker_build.output.full_image_name}
