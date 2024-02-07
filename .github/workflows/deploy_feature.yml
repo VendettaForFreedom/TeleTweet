@@ -58,13 +58,14 @@ jobs:
           CHANNEL_ID=${{ secrets.CHANNEL_ID}}
           ALLOW_USER=${{ secrets.ALLOW_USER}}
           full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
-          echo DEPLOYED_DOCKER_IMAGE=${full_image_name} > .env
+          echo DOCKER_IMAGE_DEPLOYED=${full_image_name} > .env
           echo "showing the content of the .env file:"
           cat .env
 
       - name: create local env file
         run: |
-          /bin/bash .ci_utils/create_env_file.sh
+          cp create_env_file.sh .
+          /bin/bash create_env_file.sh
 
       - name: config ssh
         uses: shimataro/ssh-key-action@v2
