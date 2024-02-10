@@ -1,7 +1,6 @@
 name: deployment Workflow
 
 on:
-  workflow_dispatch:
   pull_request:
     branches:
       - development
