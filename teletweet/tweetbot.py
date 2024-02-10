@@ -132,6 +132,7 @@ def user_check(func):
                 return
             return func(client, message)
         else:
+            logging.info(f"allowed users: {ALLOW_USER}")
             bot.send_message(message.chat.id, "You're not allowed to use this bot.")
 
     return wrapper
