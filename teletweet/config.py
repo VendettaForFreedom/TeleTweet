@@ -20,7 +20,6 @@ ACCESS_SECRET = os.getenv("ACCESS_SECRET", "")
 CONFIG_CHANNEL_ID = os.getenv("CONFIG_CHANNEL_ID", "")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
 # AUTH_STRING = os.getenv("AUTH_STRING", "")
-ALLOW_USER = os.getenv("ALLOW_USER", "5689718946").split(",")
 
 FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nکانال و توییتر:\n@FreeVPNHomes\nhttps://twitter.com/FreeVPNHomes"
 TODAY_CONFIG = "کانفیگ های امروز"
