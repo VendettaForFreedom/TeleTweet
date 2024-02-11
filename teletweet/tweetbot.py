@@ -17,7 +17,7 @@ import requests
 from pyrogram import Client, enums, filters, types
 from tgbot_ping import get_runtime
 
-from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, tweet_format
+from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USER, tweet_format
 from helper import get_auth_data, sign_in, sign_off
 from tweet import (
     delete_tweet,
@@ -32,8 +32,6 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(filename)s [%(le
 logging.getLogger("apscheduler.executors.default").propagate = False
 media_group = {}
 bot = Client("teletweet", APP_ID, APP_HASH, bot_token=BOT_TOKEN)
-
-ALLOW_USER = os.getenv("ALLOW_USER", "").split(",")
 
 STEP = {}
 
@@ -113,29 +111,12 @@ def delete_handler(client, message: types.Message):
 def user_check(func):
     def wrapper(client, message):
         user_id = message.chat.id
-        if str(user_id) in ALLOW_USER:
-        # prevent channel messages to be processed
-        # if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID]:
-            # check state machien first
-            if STEP.get(message.chat.id) == "sign_in":
-                # if sign_in(message.chat.id, message.text) == True:
-                    # bot.send_message(message.chat.id, "Welcome!")
-                try:
-                    result = sign_in(message.chat.id, message.text)
-                except Exception as e:
-                    result = str(e)
-                message.reply_text(result, quote=True)
-                STEP.pop(message.chat.id)
+        if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID]:
+            if str(user_id) in ALLOW_USER:
+                return func(client, message)
+            else:
+                bot.send_message(message.chat.id, "You're not allowed to use this bot.")
                 return
-            elif not get_auth_data(message.chat.id):
-                logging.warning("Invalid user %d", message.chat.id)
-                message.reply_chat_action(enums.ChatAction.TYPING)
-                bot.send_message(message.chat.id, "Sorry, I can't find your auth data. Type /sign_in to try again.")
-                return
-            return func(client, message)
-        else:
-            bot.send_message(message.chat.id, "You're not allowed to use this bot.")
-
     return wrapper
 
 def send_ad_message(message):
@@ -153,8 +134,8 @@ def send_ad_message(message):
         today_config + last_message + feedback + sign
     )
 
-    result = send_tweet(messageNew)
-    notify_result(result, message)
+    # result = send_tweet(messageNew)
+    # notify_result(result, message)
     return messageNew
 
 def handle_message(message):
