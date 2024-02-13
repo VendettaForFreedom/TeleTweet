@@ -27,4 +27,4 @@ SIGN = """\n\nhttps://t.me/FreeVPNHomes\n\nبه امید آزادی #توماج_
 LAST_MESSAGE = ":\nhttps://t.me/FreeVPNHomesConfigs/"
 
 tweet_format = "https://twitter.com/{screen_name}/status/{id}"
-ALLOW_USER = os.getenv("ALLOW_USERS", "").split(",")
+ALLOW_USERS = os.getenv("ALLOW_USERS", "").split(",")

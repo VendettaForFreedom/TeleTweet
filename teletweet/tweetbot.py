@@ -17,7 +17,7 @@ import requests
 from pyrogram import Client, enums, filters, types
 from tgbot_ping import get_runtime
 
-from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USER, FEEDBACK, TODAY_CONFIG, SIGN, LAST_MESSAGE, tweet_format
+from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, FEEDBACK, TODAY_CONFIG, SIGN, LAST_MESSAGE, tweet_format
 from helper import get_auth_data, sign_in, sign_off
 from tweet import (
     delete_tweet,
@@ -43,7 +43,7 @@ def start_handler(client, message: types.Message):
         bot.send_message(message.chat.id, "Start by sending me a message?")
         return
     msg = "Welcome to TeleTweet. " "This bot will connect you from Telegram Bot to Twitter. " "Want to get started now? Type /sign_in now!"
-    if ALLOW_USER != [""]:
+    if ALLOW_USERS != [""]:
         msg += "\n\nTHIS BOT IS ONLY AVAILABLE TO CERTAIN USERS. Contact creator for help."
     bot.send_message(message.chat.id, msg)
 
@@ -114,7 +114,7 @@ def user_check(func):
         logging.info("User %s is using the bot", user_id)
         if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID]:
             logging.info("User %s got into the first if", user_id)
-            if str(user_id) in ALLOW_USER:
+            if str(user_id) in ALLOW_USERS:
                 logging.info("User %s got into the second if", user_id)
                 return func(client, message)
             
