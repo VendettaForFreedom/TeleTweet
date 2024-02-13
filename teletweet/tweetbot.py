@@ -112,14 +112,17 @@ def user_check(func):
     def wrapper(client, message):
         user_id = message.chat.id
         logging.info("User %s is using the bot", user_id)
+        
         if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID]:
             logging.info("User %s got into the first if", user_id)
-            if str(user_id) in ALLOW_USER:
+            if str(user_id) in ALLOW_USERS:
                 logging.info("User %s got into the second if", user_id)
+                logging.info("User %s is authenticated!")
                 return func(client, message)
             
             else:
                 logging.info("User %s got into the else", user_id)
+                logging.info("User %s is not authenticated!")
                 bot.send_message(message.chat.id, "You're not allowed to use this bot.")
                 return
     return wrapper
