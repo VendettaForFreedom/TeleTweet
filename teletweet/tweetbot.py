@@ -17,7 +17,7 @@ import requests
 from pyrogram import Client, enums, filters, types
 from tgbot_ping import get_runtime
 
-from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USER, tweet_format
+from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, tweet_format
 from helper import get_auth_data, sign_in, sign_off
 from tweet import (
     delete_tweet,

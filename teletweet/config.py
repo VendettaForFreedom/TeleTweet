@@ -21,4 +21,4 @@ CONFIG_CHANNEL_ID = os.getenv("CONFIG_CHANNEL_ID", "")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
 
 tweet_format = "https://twitter.com/{screen_name}/status/{id}"
-ALLOW_USER = os.getenv("ALLOW_USERS", "").split(",")
+ALLOW_USERS = os.getenv("ALLOW_USERS", "").split(",")
