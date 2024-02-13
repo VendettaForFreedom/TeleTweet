@@ -98,3 +98,4 @@ jobs:
           ssh -i ./private.key "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose up -d"
           echo "the deployement is done"
           ssh -i ./private.key "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose ps"
+          echo done with all the steps
