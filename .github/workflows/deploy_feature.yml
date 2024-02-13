@@ -55,7 +55,7 @@ jobs:
           echo ACCESS_SECRET=${{ secrets.ACCESS_SECRET}} >> teletweet.env
           echo CONFIG_CHANNEL_ID=${{ secrets.CONFIG_CHANNEL_ID}} >> teletweet.env
           echo CHANNEL_ID=${{ secrets.CHANNEL_ID}} >> teletweet.env
-          echo ALLOW_USER=${{ secrets.ALLOW_USER}} >> teletweet.env
+          echo ALLOW_USERS=${{ secrets.ALLOW_USER}} >> teletweet.env
           full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
           echo DOCKER_IMAGE_DEPLOYED=${full_image_name} > .env
           echo "showing the content of the .env file:"
