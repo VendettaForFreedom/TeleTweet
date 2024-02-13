@@ -16,8 +16,7 @@ from threading import Lock
 import requests
 from pyrogram import Client, enums, filters, types
 from tgbot_ping import get_runtime
-
-from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, tweet_format
+from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, FEEDBACK, TODAY_CONFIG, SIGN, LAST_MESSAGE, tweet_format
 from helper import get_auth_data, sign_in, sign_off
 from tweet import (
     delete_tweet,
@@ -43,7 +42,7 @@ def start_handler(client, message: types.Message):
         bot.send_message(message.chat.id, "Start by sending me a message?")
         return
     msg = "Welcome to TeleTweet. " "This bot will connect you from Telegram Bot to Twitter. " "Want to get started now? Type /sign_in now!"
-    if ALLOW_USER != [""]:
+    if ALLOW_USERS != [""]:
         msg += "\n\nTHIS BOT IS ONLY AVAILABLE TO CERTAIN USERS. Contact creator for help."
     bot.send_message(message.chat.id, msg)
 
@@ -128,28 +127,24 @@ def user_check(func):
     return wrapper
 
 def send_ad_message(message):
-    feedback = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nکانال و توییتر:\n@FreeVPNHomes\nhttps://twitter.com/FreeVPNHomes"
-    today_config = "کانفیگ های امروز"
-    sign = """\n\nبه امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
     messageNew = bot.send_message(
         CONFIG_CHANNEL_ID, 
-        today_config + feedback + sign
+        TODAY_CONFIG + FEEDBACK + SIGN
     )
     time.sleep(1)
-    last_message = f""":\nhttps://t.me/FreeVPNHomesConfigs/{messageNew.id}"""
+    last_message = LAST_MESSAGE + f"{messageNew.id}"
     bot.send_message(
         CHANNEL_ID, 
-        today_config + last_message + feedback + sign
+        TODAY_CONFIG + last_message + FEEDBACK + SIGN
     )
 
-    result = send_tweet(messageNew)
-    notify_result(result, message)
+    # result = send_tweet(messageNew)
+    # notify_result(result, message)
     return messageNew
 
 def handle_message(message):
 
     send_ad_message(message)
-    sign = """\n\n@FreeVPNHomes\n\nبه امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
     text = message.text or message.caption
     parts = text.split("\n")
     for part in parts:
@@ -157,7 +152,7 @@ def handle_message(message):
         # messageNew = bot.send_message(message.chat.id, part)
         # logging.info(messageNew)
         if len(part) > 10:
-            bot.send_message(CONFIG_CHANNEL_ID, part + sign)
+            bot.send_message(CONFIG_CHANNEL_ID, part + SIGN)
             time.sleep(1)
 
 @bot.on_message(filters.incoming & filters.text)
