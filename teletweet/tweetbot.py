@@ -161,14 +161,15 @@ def handle_message(message, send_ad=True):
 def config_handler(client, message: types.Message):
     message.reply_chat_action(enums.ChatAction.TYPING)
 
-    handle_message(message, False)
+    STEP[message.chat.id] = "single_config"
 
 @bot.on_message(filters.command(["multiple_configs"]))
 @user_check
 def config_handler(client, message: types.Message):
     message.reply_chat_action(enums.ChatAction.TYPING)
 
-    handle_message(message)
+    STEP[message.chat.id] = "multiple_configs"
+    
 
 @bot.on_message(filters.incoming & filters.text)
 @user_check
@@ -186,8 +187,15 @@ def tweet_text_handler(client, message: types.Message):
         )
         message.reply_text("Do you want to download video or just tweet this?", quote=True, reply_markup=markup)
         return
-
-    # handle_message(message)
+    
+    if STEP.get(message.chat.id) == "single_config":
+        handle_message(message, False)
+        STEP.pop(message.chat.id)
+        return
+    elif STEP.get(message.chat.id) == "multiple_configs":
+        handle_message(message)
+        STEP.pop(message.chat.id)
+        return
 
 @bot.on_message(filters.media_group)
 @user_check
