@@ -160,14 +160,14 @@ def handle_message(message, send_ad=True):
 @user_check
 def config_handler(client, message: types.Message):
     message.reply_chat_action(enums.ChatAction.TYPING)
-
+    bot.send_message(message.chat.id, "Send me a single config I send it without any ad.")
     STEP[message.chat.id] = "single_config"
 
 @bot.on_message(filters.command(["multiple_configs"]))
 @user_check
 def config_handler(client, message: types.Message):
     message.reply_chat_action(enums.ChatAction.TYPING)
-
+    bot.send_message(message.chat.id, "Send me a list of configs I send them with an ad.")
     STEP[message.chat.id] = "multiple_configs"
     
 
