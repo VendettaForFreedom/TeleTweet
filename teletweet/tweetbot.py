@@ -143,18 +143,32 @@ def send_ad_message(message):
     # notify_result(result, message)
     return messageNew
 
-def handle_message(message):
-
-    send_ad_message(message)
+def handle_message(message, send_ad=True):
     text = message.text or message.caption
     parts = text.split("\n")
-    for part in parts:
-        # to test on the user itself uncomment
-        # messageNew = bot.send_message(message.chat.id, part)
-        # logging.info(messageNew)
-        if len(part) > 10:
-            bot.send_message(CONFIG_CHANNEL_ID, part + SIGN)
-            time.sleep(1)
+    if send_ad:
+        send_ad_message(message)
+        for part in parts:
+            if len(part) > 10:
+                bot.send_message(CONFIG_CHANNEL_ID, part + SIGN)
+                time.sleep(1)
+    else:
+        bot.send_message(CONFIG_CHANNEL_ID, text + SIGN)
+
+
+@bot.on_message(filters.command(["single_config"]))
+@user_check
+def config_handler(client, message: types.Message):
+    message.reply_chat_action(enums.ChatAction.TYPING)
+
+    handle_message(message, False)
+
+@bot.on_message(filters.command(["multiple_configs"]))
+@user_check
+def config_handler(client, message: types.Message):
+    message.reply_chat_action(enums.ChatAction.TYPING)
+
+    handle_message(message)
 
 @bot.on_message(filters.incoming & filters.text)
 @user_check
@@ -173,7 +187,7 @@ def tweet_text_handler(client, message: types.Message):
         message.reply_text("Do you want to download video or just tweet this?", quote=True, reply_markup=markup)
         return
 
-    handle_message(message)
+    # handle_message(message)
 
 @bot.on_message(filters.media_group)
 @user_check
