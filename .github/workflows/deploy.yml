@@ -29,7 +29,7 @@ jobs:
           if [[ $tags != "" ]] ; then latest_tag=${tags[-1]} ; else latest_tag=V0.0.0 ; fi
           echo ${latest_tag}
           echo "latest_tag=${latest_tag}">> $GITHUB_OUTPUT
-      
+
       - name: bump_version
         env:
           LATEST_TAG: ${{ steps.get_latest_tag.outputs.latest_tag }}
@@ -52,7 +52,7 @@ jobs:
             /bin/bash ./tag.sh $LATEST_TAG bump_patch
             cd ..
           fi
-  
+
   build_n_deploy:
     if: github.event.pull_request.merged == true
     needs: versioning
@@ -122,6 +122,7 @@ jobs:
           SSH_KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
 
       - name: Deploy to server
+        id: deploy_to_server
         run: |
           ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
           full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
@@ -137,4 +138,14 @@ jobs:
           echo "the deployement is done"
           ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker compose ps"
           echo done with all the steps
-          rm -r ~/.ssh/*
+
+      - name: remove old images
+        if: success() && steps.deploy_to_server.outcome == 'success'
+        run: |
+          full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
+          scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r .ci_utils/cleanup_old_images.sh "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
+          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && /bin/bash cleanup_old_images.sh ${full_image_name}"
+
+      - name: remove ssh folder
+        run: |
+          rm -rf ~/.ssh/*
