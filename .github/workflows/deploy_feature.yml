@@ -66,7 +66,7 @@ jobs:
           cp .ci_utils/create_env_file.sh .
           /bin/bash create_env_file.sh
 
-      - name: ssh test
+      - name: ssh config
         run: |
           mkdir -p ~/.ssh/
           echo "$SSH_PRIVATE_KEY" > private.key
@@ -76,7 +76,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.KEY_MANAGED }}
           SSH_KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
 
-      - name: Deploy to EC2
+      - name: Deploy to server
         run: |
           ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
           full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
@@ -88,8 +88,8 @@ jobs:
           scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r ./docker-compose.yml "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
           scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r ./.env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
           echo "the environment file has been copied to the server"
-          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose up -d"
+          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker compose up -d"
           echo "the deployement is done"
-          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose ps"
+          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker compose ps"
           echo done with all the steps
           rm -r ~/.ssh/*
