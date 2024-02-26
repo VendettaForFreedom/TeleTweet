@@ -93,7 +93,6 @@ jobs:
           echo "the deployement is done"
           ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker compose ps"
           echo done with all the steps
-          rm -r ~/.ssh/*
       
       - name: remove old images
         if: success() && steps.deploy_to_server.outcome == 'success'
@@ -101,3 +100,8 @@ jobs:
           full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
           scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r .ci_utils/cleanup_old_images.sh "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
           ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && /bin/bash cleanup_old_images.sh ${full_image_name}"
+      
+
+      - name: remove ssh folder
+        run: |
+          rm -rf ~/.ssh/*
