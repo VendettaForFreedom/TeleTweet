@@ -85,17 +85,18 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
-          full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
-          echo full_image_name: $full_image_name
-          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "if [ -e ~/teletweet/docker-compose.yml]; then cd ~/teletweet && docker-compose down; fi" 
-          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" docker pull "${full_image_name}"
-          scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
-          scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./teletweet.env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/env/
-          scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./teletweet "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
-          scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./docker-compose.yml "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
-          scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./.env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
-          echo "the environment file has been copied to the server"
-          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose up -d"
-          echo "the deployement is done"
-          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose ps"
-          echo done with all the steps
+          # full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
+          # echo full_image_name: $full_image_name
+          # ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "if [ -e ~/teletweet/docker-compose.yml]; then cd ~/teletweet && docker-compose down; fi" 
+          # ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" docker pull "${full_image_name}"
+          # scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
+          # scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./teletweet.env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/env/
+          # scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./teletweet "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
+          # scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./docker-compose.yml "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
+          # scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./.env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
+          # echo "the environment file has been copied to the server"
+          # ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose up -d"
+          # echo "the deployement is done"
+          # ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker-compose ps"
+          # echo done with all the steps
+          rm -r ~/.ssh/*
