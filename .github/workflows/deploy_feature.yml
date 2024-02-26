@@ -66,12 +66,6 @@ jobs:
           cp .ci_utils/create_env_file.sh .
           /bin/bash create_env_file.sh
 
-      - name: config ssh
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.KEY_MANAGED }}
-          known_hosts: "just-a-placeholder-so-we-dont-get-errors"
-
       - name: ssh test
         run: |
           mkdir -p ~/.ssh/
