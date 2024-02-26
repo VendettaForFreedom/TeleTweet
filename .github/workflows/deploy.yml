@@ -126,7 +126,6 @@ jobs:
           ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
           full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
           echo full_image_name: $full_image_name
-          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "if [ -e ~/teletweet/docker-compose.yml]; then cd ~/teletweet && docker-compose down; fi" 
           ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" docker pull "${full_image_name}"
           scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
           scp -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" -r ./teletweet.env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/env/
