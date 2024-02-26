@@ -34,7 +34,7 @@ jobs:
         run: |
           commit_hash=$(git rev-parse --short HEAD)
           echo "docker image name: ${{vars.DOCKER_IMAGE}}"
-          full_image_name=${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE }}:feature-${{ steps.get_latest_tag.outputs.latest_tag }}-${commit_hash}
+          full_image_name=${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE }}_feature:${{ steps.get_latest_tag.outputs.latest_tag }}-${commit_hash}
           echo "full_image_name=${full_image_name}"
           docker build -t ${{vars.DOCKER_IMAGE}}:latest .
           echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ vars.DOCKER_HUB_USERNAME }}" --password-stdin 
@@ -77,6 +77,7 @@ jobs:
           SSH_KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
 
       - name: Deploy to server
+        id: deploy_to_server
         run: |
           ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
           full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
@@ -93,3 +94,10 @@ jobs:
           ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker compose ps"
           echo done with all the steps
           rm -r ~/.ssh/*
+      
+      - name: remove old images
+        if: success() && steps.deploy_to_server.outcome == 'success'
+        run: |
+          full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
+          scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r .ci_utils/cleanup_old_images.sh "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
+          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && /bin/bash cleanup_old_images.sh ${full_image_name}"
