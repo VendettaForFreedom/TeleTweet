@@ -97,9 +97,9 @@ jobs:
       - name: remove old images
         if: success() && steps.deploy_to_server.outcome == 'success'
         run: |
-          full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
+          image_name=${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE }}_feature
           scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r .ci_utils/cleanup_old_images.sh "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
-          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && /bin/bash cleanup_old_images.sh ${full_image_name}"
+          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && /bin/bash cleanup_old_images.sh ${image_name}"
       
 
       - name: remove ssh folder
