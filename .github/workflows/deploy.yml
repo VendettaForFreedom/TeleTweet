@@ -35,8 +35,8 @@ jobs:
           LATEST_TAG: ${{ steps.get_latest_tag.outputs.latest_tag }}
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
-          git config --local user.name ${{ secrets.VERSIONING_USER }}
-          git config --local user.email ${{ secrets.VERSIONING_EMAIL }}
+          git config user.name ${{ secrets.VERSIONING_USER }}
+          git config user.email ${{ secrets.VERSIONING_EMAIL }}
           echo "bumping the version"
           if [[ ${{ contains(github.event.pull_request.labels.*.name, 'bump_minor') }} == true ]] ; then
             echo "Bumping minor version"
