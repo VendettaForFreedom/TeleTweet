@@ -14,7 +14,7 @@ from typing import Union
 
 import tweepy
 
-from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
+from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET, TODAY_CONFIG, SIGN, LAST_MESSAGE
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(filename)s [%(levelname)s]: %(message)s")
 
@@ -53,8 +53,8 @@ def send_tweet(message, pics: Union[list, None] = None) -> dict:
     logging.info("Preparing tweet for...")
     chat_id = message.chat.id
     # text = message.text or message.caption
-    text = f"""کانفیگ های امروز:\nhttps://t.me/FreeVPNHomesConfigs/{message.id}"""
-    channel_info = f"""\n\nhttps://t.me/FreeVPNHomes\n\nبه امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
+    text = TODAY_CONFIG + LAST_MESSAGE + f"{message.id}"
+    channel_info = SIGN
     if not text:
         text = channel_info 
     if len(text) + len(channel_info) > 280:

@@ -1,0 +1,107 @@
+name: deployment_feature_Workflow
+
+on:
+  pull_request:
+    branches:
+      - development
+    types:
+      - synchronize
+      - labeled
+
+jobs:
+  build_n_deploy:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.pull_request.head.ref, 'feature-')  && contains(github.event.pull_request.labels.*.name, 'build')
+
+    environment:
+      name: feature
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: get the latest tag
+        id: get_latest_tag
+        run: |
+          git fetch --tags
+          tags=($(git tag --sort=committerdate))
+          if [[ $tags != "" ]] ; then latest_tag=${tags[-1]} ; else latest_tag=V0.0.0 ; fi
+          echo ${latest_tag}
+          echo "latest_tag=${latest_tag}" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Docker Image
+        id: docker_build
+        run: |
+          commit_hash=$(git rev-parse --short HEAD)
+          echo "docker image name: ${{vars.DOCKER_IMAGE}}"
+          full_image_name=${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE }}_feature:${{ steps.get_latest_tag.outputs.latest_tag }}-${commit_hash}
+          echo "full_image_name=${full_image_name}"
+          docker build -t ${{vars.DOCKER_IMAGE}}:latest .
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ vars.DOCKER_HUB_USERNAME }}" --password-stdin 
+          docker tag  ${{vars.DOCKER_IMAGE}}:latest ${full_image_name}
+          docker push ${full_image_name}
+          echo "DEPLOYED_DOCKER_IMAGE=${full_image_name}" >> env/teletweet.env
+          echo "full_image_name=${full_image_name}" >> $GITHUB_OUTPUT
+
+      - name: create .env file
+        run: |
+          echo "TOKEN"=${{ secrets.TOKEN}} >> teletweet.env
+          echo CONSUMER_KEY=${{ secrets.CONSUMER_KEY}} >> teletweet.env
+          echo CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET}} >> teletweet.env
+          echo #CALLBACK_URL= >> teletweet.env
+          echo APP_ID=${{ secrets.APP_ID}} >> teletweet.env
+          echo APP_HASH=${{ secrets.APP_HASH}} >> teletweet.env
+          echo ACCESS_KEY=${{ secrets.ACCESS_KEY}} >> teletweet.env
+          echo ACCESS_SECRET=${{ secrets.ACCESS_SECRET}} >> teletweet.env
+          echo CONFIG_CHANNEL_ID=${{ secrets.CONFIG_CHANNEL_ID}} >> teletweet.env
+          echo CHANNEL_ID=${{ secrets.CHANNEL_ID}} >> teletweet.env
+          echo ALLOW_USERS=${{ secrets.ALLOW_USER}} >> teletweet.env
+          full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
+          echo DOCKER_IMAGE_DEPLOYED=${full_image_name} > .env
+          echo "showing the content of the .env file:"
+          cat .env
+
+      - name: create local env file
+        run: |
+          cp .ci_utils/create_env_file.sh .
+          /bin/bash create_env_file.sh
+
+      - name: ssh config
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > private.key
+          sudo chmod 600 private.key
+          echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.KEY_MANAGED }}
+          SSH_KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Deploy to server
+        id: deploy_to_server
+        run: |
+          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "mkdir -p ~/teletweet"
+          full_image_name="${{ steps.docker_build.outputs.full_image_name }}"
+          echo full_image_name: $full_image_name
+          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" docker pull "${full_image_name}"
+          scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r ./env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
+          scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r ./teletweet.env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/env/
+          scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r ./teletweet "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
+          scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r ./docker-compose.yml "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
+          scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r ./.env "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
+          echo "the environment file has been copied to the server"
+          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker compose up -d"
+          echo "the deployement is done"
+          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && docker compose ps"
+          echo done with all the steps
+      
+      - name: remove old images
+        if: success() && steps.deploy_to_server.outcome == 'success'
+        run: |
+          image_name=${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE }}_feature
+          scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r .ci_utils/cleanup_old_images.sh "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet/
+          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet && /bin/bash cleanup_old_images.sh ${image_name}"
+      
+
+      - name: remove ssh folder
+        run: |
+          rm -rf ~/.ssh/*

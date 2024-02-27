@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 Instance with AmazonEC2RoleforSSM and Security Group
+Parameters:
+  SshKeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: the key to access the ec2 for ssh
+
+  EC2ImageId:
+    Type: String
+    Description: the image for the instance
+    Default: "ami-0fef2f5dd8d0917e8" 
+
+  MyPublicIP:
+    Type: String
+    Description: the public ip for ssh connection 
+
+  SshPort:
+    Type: Number
+    Default: 22
+    Description: the port for ssh
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    Description: the type of the Ec2 instance
+  
+Resources:
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH and SSM traffic
+      SecurityGroupIngress:
+        - CidrIp: !Join [ '/', [!Ref MyPublicIP, '32']]
+          IpProtocol: tcp
+          FromPort: !Ref SshPort
+          ToPort: !Ref SshPort
+        # - CidrIp: 0.0.0.0/0
+        #   IpProtocol: tcp
+        #   FromPort: 443
+        #   ToPort: 443
+      # SecurityGroupEgress:
+      #   - IpProtocol: tcp
+      #     FromPort: 443
+      #     ToPort: 443
+      #     CidrIp: 0.0.0.0/0
+      #   - IpProtocol: tcp
+      #     FromPort: 80
+      #     ToPort: 80
+      #     CidrIp: 0.0.0.0/0
+
+  MySSMAgentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+
+  MyInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref MySSMAgentRole
+
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref EC2ImageId
+      InstanceType: !Ref InstanceType
+      SecurityGroups:
+        - !Ref MySecurityGroup
+      IamInstanceProfile: !Ref MyInstanceProfile
+      KeyName: !Ref SshKeyName  # Use the selected SSH key pair
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum install -y amazon-ssm-agent
+          systemctl enable amazon-ssm-agent
+          systemctl start amazon-ssm-agent
+
+Outputs:
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref MyEC2Instance

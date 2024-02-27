@@ -2,19 +2,19 @@ version: '3.1'
 
 services:
   bot:
-    image: bennythink/teletweet
+    image: ${DOCKER_IMAGE_DEPLOYED}
     restart: on-failure
     volumes:
       - ./env/auth.json:/TeleTweet/teletweet/auth.json
     env_file:
       - env/teletweet.env
 
-  web:
-    image: bennythink/teletweet
-    restart: always
-    env_file:
-      - env/teletweet.env
-    working_dir: /TeleTweet/twauth-web
-    command: python twauth.py -h=0.0.0.0
-    ports:
-      - "8888:8888"
+  # web:
+  #   image: bennythink/teletweet
+  #   restart: always
+  #   env_file:
+  #     - env/teletweet.env
+  #   working_dir: /TeleTweet/twauth-web
+  #   command: python twauth.py -h=0.0.0.0
+  #   ports:
+  #     - "8888:8888"

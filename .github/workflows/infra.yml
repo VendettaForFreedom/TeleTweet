@@ -1,0 +1,83 @@
+name: Infrastructure Workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - development
+    paths:
+    - '.deployment/**'
+    types:
+      - closed
+  pull_request:
+    branches:
+      - development
+    paths:
+    - '.deployment/**'
+    types:
+      - closed
+  
+
+jobs:
+  infra:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+
+      - name: get the latest tag
+        id: get_latest_tag
+        run: |
+          git fetch --tags
+          tags=($(git tag --sort=committerdate))
+          if [[ $tags != "" ]] ; then latest_tag=${tags[-1]} ; else latest_tag=V0.0.0 ; fi
+          echo ${latest_tag}
+          echo "::set-output name=latest_tag::${latest_tag}"
+
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: your-aws-region
+
+
+      - name: create parameters.json
+        run: |
+          python .deployment/parameters.py 
+
+
+      - name: Check if CloudFormation stack exists
+        id: check-stack
+        run: |
+          if aws cloudformation describe-stacks --stack-name $CF_STACK_NAME 2>/dev/null; then
+            echo "::set-output name=stack_exists::true"
+          else
+            echo "::set-output name=stack_exists::false"
+          fi
+
+
+      - name: Deliver to S3
+        run: |
+          aws s3 cp .deployment/cloudformation.yml s3://your-s3-bucket/
+          
+
+      - name: Update Stack
+        if: steps.check-stack.outputs.stack_exists == 'true'
+        run: |
+          aws cloudformation update-stack --stack-name your-stack-name \
+            --template-url https://your-s3-bucket.s3.amazonaws.com/cloudformation.yml \
+            --parameters file://.deployment/parameters.json \
+            --capabilities CAPABILITY_IAM
+      
+      - name: Create Stack
+        if: steps.check-stack.outputs.stack_exists == 'false'
+        run: |
+          aws cloudformation create-stack --stack-name your-stack-name \
+            --template-url https://your-s3-bucket.s3.amazonaws.com/cloudformation.yml \
+            --parameters file://.deployment/parameters.json \
+            --capabilities CAPABILITY_IAM
+
