@@ -4,7 +4,7 @@
 IMAGE_NAME=$1
 
 # List all tags for the image
-TAGS=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "^${IMAGE_NAME}")
+TAGS=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "^${IMAGE_NAME}:")
 
 
 echo tags: $TAGS
