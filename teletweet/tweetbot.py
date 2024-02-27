@@ -89,7 +89,7 @@ def help_handler(client, message: types.Message):
     except TypeError:
         userinfo = "Hello👋 unknown user! Want to `/sign_in` now?\n\n"
 
-    info = get_runtime("botsrunner_teletweet_1")[:500]
+    # info = get_runtime("botsrunner_teletweet_1")[:500]
     bot.send_message(message.chat.id, userinfo + info, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
