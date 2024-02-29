@@ -33,5 +33,8 @@ After configuring `config.py`, run `tweetbot.py` to start the bot. Interact with
 ## Contributing
 Contributions are welcome! If you have suggestions or want to add features, please fork the repository, commit your changes, and submit a pull request.
 
+- We have deployment on feature-* branches that has an open pull request with build tag
+- Production deployment when there is a merge on deployment branch
+
 ## License
 GPL 2.0__
