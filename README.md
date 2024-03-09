@@ -23,7 +23,7 @@ Before launching the Teletweet bot, you must accurately configure it with your A
 
 - **Twitter Configuration**:
   - `ACCESS_KEY` and `ACCESS_SECRET`: Your Twitter API key and secret key, obtained when you create a new application on the Twitter Developer portal.
-  - Additional Twitter-specific configurations may include tokens for user authentication: `ACCESS_TOKEN` and `ACCESS_TOKEN_SECRET`, which are typically obtained through the OAuth process when a user authenticates their account with your application.
+  - Additional Twitter-specific configurations may include tokens for user authentication: `CONSUMER_KEY` and `CONSUMER_SECRET`, which are typically obtained through the OAuth process when a user authenticates their account with your application.
 
 - **Bot Settings**:
   - `CHANNEL_ID` and `CONFIG_CHANNEL_ID`: Telegram channel IDs used for specific functionalities by the bot, if required.
@@ -36,11 +36,13 @@ Ensure that you replace placeholder values in `config.py` with your actual API k
 Bot Commands
 The bot recognizes commands for user interaction, allowing management of Twitter activities via Telegram. Here's a reminder of the commands and their functionalities:
 
-/start: Greets the user and provides initial instructions or the authentication link for Twitter.
-/sign_in: Initiates Twitter authentication, guiding the user through obtaining and submitting an authentication code.
+`/start`: Greets the user and provides initial instructions or the authentication link for Twitter.
+
+`/sign_in`: Initiates Twitter authentication, guiding the user through obtaining and submitting an authentication code.
+
+`/sign_off`: Logs the user out, disconnecting their Twitter account from the bot.
+
 Direct Messaging: Users can send tweets (text or media) directly by messaging the bot.
-/sign_off: Logs the user out, disconnecting their Twitter account from the bot.
-Remember to secure your API keys and sensitive information, especially when contributing to public repositories or sharing your code.
 
 ## Usage
 After configuring `config.py` with your API keys and other settings, run `tweetbot.py` to start the Telegram bot. Follow the bot's instructions for signing in to Twitter and using the available commands to tweet.
