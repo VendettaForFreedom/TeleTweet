@@ -15,23 +15,38 @@ Teletweet seamlessly connects Telegram with Twitter, empowering users to manage 
 3. Install necessary Python dependencies by executing `pip install -r requirements.txt`.
 
 ## Configuration (`config.py`)
-Before running the Teletweet bot, you must configure it with your own API keys and settings in `config.py`. Here's what needs to be configured:
+Before launching the Teletweet bot, you must accurately configure it with your API keys and settings in `config.py`. This configuration involves setting up both Telegram and Twitter API credentials, along with additional settings specific to the bot's operation:
 
-- `APP_ID` and `APP_HASH`: These are your Telegram application ID and hash, obtainable from [my.telegram.org](https://my.telegram.org).
-- `BOT_TOKEN`: Your Telegram bot token, provided by @BotFather on Telegram after creating a new bot.
-- `CHANNEL_ID` and `CONFIG_CHANNEL_ID`: IDs of Telegram channels for specific bot functionalities, if needed.
-- `ALLOW_USERS`: A list of Telegram user IDs allowed to use this bot. Leave empty (`[""]`) to allow everyone.
-- `FEEDBACK`: Optional; set a Telegram username or channel ID to receive feedback.
-- `TODAY_CONFIG`, `SIGN`, and `LAST_MESSAGE`: Configuration settings for bot operation details.
-- `tweet_format`: The URL format for tweets, used to generate links to posted tweets.
+- **Telegram Configuration**:
+  - `APP_ID` and `APP_HASH`: These are your Telegram application ID and hash, obtainable after creating a new application at [my.telegram.org](https://my.telegram.org).
+  - `BOT_TOKEN`: The token for your Telegram bot, provided by BotFather when you create a new bot on Telegram.
 
-Ensure you replace placeholder values in `config.py` with your actual API keys and settings.
+- **Twitter Configuration**:
+  - `ACCESS_KEY` and `ACCESS_SECRET`: Your Twitter API key and secret key, obtained when you create a new application on the Twitter Developer portal.
+  - Additional Twitter-specific configurations may include tokens for user authentication: `ACCESS_TOKEN` and `ACCESS_TOKEN_SECRET`, which are typically obtained through the OAuth process when a user authenticates their account with your application.
+
+- **Bot Settings**:
+  - `CHANNEL_ID` and `CONFIG_CHANNEL_ID`: Telegram channel IDs used for specific functionalities by the bot, if required.
+  - `ALLOW_USERS`: A list of Telegram user IDs permitted to use this bot. Leave as `[""]` to allow open access.
+  - `FEEDBACK`: Optionally, set a Telegram username or channel ID to receive feedback.
+  - Configuration constants like `TODAY_CONFIG`, `SIGN`, `LAST_MESSAGE`, and `tweet_format` define operational details for the bot.
+
+Ensure that you replace placeholder values in `config.py` with your actual API keys and settings. Proper configuration is crucial for the bot's operation, as it needs to authenticate and interact with both Telegram and Twitter APIs successfully.
+
+Bot Commands
+The bot recognizes commands for user interaction, allowing management of Twitter activities via Telegram. Here's a reminder of the commands and their functionalities:
+
+/start: Greets the user and provides initial instructions or the authentication link for Twitter.
+/sign_in: Initiates Twitter authentication, guiding the user through obtaining and submitting an authentication code.
+Direct Messaging: Users can send tweets (text or media) directly by messaging the bot.
+/sign_off: Logs the user out, disconnecting their Twitter account from the bot.
+Remember to secure your API keys and sensitive information, especially when contributing to public repositories or sharing your code.
 
 ## Usage
-After configuring `config.py`, run `tweetbot.py` to start the bot. Interact with the bot on Telegram using the commands provided above.
+After configuring `config.py` with your API keys and other settings, run `tweetbot.py` to start the Telegram bot. Follow the bot's instructions for signing in to Twitter and using the available commands to tweet.
 
 ## Contributing
-Contributions are welcome! If you have suggestions or want to add features, please fork the repository, commit your changes, and submit a pull request.
+We encourage contributions to the Teletweet project. If you've identified a bug, have suggestions for improvements, or want to add new features, please fork the repository, make your changes, and submit a pull request.
 
 - We have deployment on feature-* branches that has an open pull request with build tag
 - Production deployment when there is a merge on deployment branch
