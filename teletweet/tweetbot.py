@@ -139,8 +139,8 @@ def send_ad_message(message):
         TODAY_CONFIG + last_message + FEEDBACK + SIGN
     )
 
-    # result = send_tweet(messageNew)
-    # notify_result(result, message)
+    result = send_tweet(messageNew)
+    notify_result(result, message)
     return messageNew
 
 def handle_message(message, send_ad=True):
