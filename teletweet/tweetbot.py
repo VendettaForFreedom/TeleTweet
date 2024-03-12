@@ -17,7 +17,7 @@ import requests
 from pyrogram import Client, enums, filters, types
 from tgbot_ping import get_runtime
 
-from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, FEEDBACK, TODAY_CONFIG, SIGN, LAST_MESSAGE, tweet_format
+from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, FEEDBACK, TODAY_CONFIG, SIGN, LAST_MESSAGE, CHANNEL, tweet_format
 from helper import get_auth_data, sign_in, sign_off
 from tweet import (
     delete_tweet,
@@ -130,13 +130,13 @@ def user_check(func):
 def send_ad_message(message):
     messageNew = bot.send_message(
         CONFIG_CHANNEL_ID, 
-        TODAY_CONFIG + FEEDBACK + SIGN
+        TODAY_CONFIG + FEEDBACK + CHANNEL + SIGN
     )
     time.sleep(1)
     last_message = LAST_MESSAGE + f"{messageNew.id}"
     bot.send_message(
         CHANNEL_ID, 
-        TODAY_CONFIG + last_message + FEEDBACK + SIGN
+        TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
     )
 
     result = send_tweet(messageNew)
@@ -150,10 +150,10 @@ def handle_message(message, send_ad=True):
         send_ad_message(message)
         for part in parts:
             if len(part) > 10:
-                bot.send_message(CONFIG_CHANNEL_ID, part + SIGN)
+                bot.send_message(CONFIG_CHANNEL_ID, part + CHANNEL + SIGN)
                 time.sleep(1)
     else:
-        bot.send_message(CONFIG_CHANNEL_ID, text + SIGN)
+        bot.send_message(CONFIG_CHANNEL_ID, text + CHANNEL + SIGN)
 
 
 @bot.on_message(filters.command(["single_config"]))
