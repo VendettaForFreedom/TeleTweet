@@ -136,7 +136,7 @@ def send_ad_message(message):
     except:
         bot.send_message(
             message.chat.id, 
-            "I can't send the message to this channel:" + CONFIG_CHANNEL_ID
+            "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID
         )
         return
     time.sleep(1)
@@ -150,7 +150,7 @@ def send_ad_message(message):
     except:
         bot.send_message(
             message.chat.id, 
-            "I can't send the message to this channel:" + CHANNEL_ID
+            "I can't send the message to the main channel:" + CHANNEL_ID
         )
         return
 
@@ -163,9 +163,8 @@ def send_ad_message(message):
     except:
         bot.send_message(
             message.chat.id, 
-            "I can't send the message to this group:" + GROUP_ID
+            "I can't send the message to the group:" + GROUP_ID
         )
-        return
 
     result = send_tweet(messageNew)
     notify_result(result, message)
