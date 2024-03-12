@@ -11,5 +11,6 @@ echo ACCESS_KEY=\"${ACCESS_KEY}\" >> env/teletweet.env
 echo ACCESS_SECRET=\"${ACCESS_SECRET}\" >> env/teletweet.env
 echo CONFIG_CHANNEL_ID=\"${CONFIG_CHANNEL_ID}\" >> env/teletweet.env
 echo CHANNEL_ID=\"${CHANNEL_ID}\" >> env/teletweet.env
+echo GROUP_ID=\"${GROUP_ID}\" >> env/teletweet.env
 echo ALLOW_USER=\"${ALLOW_USER}\" >> env/teletweet.env
 
