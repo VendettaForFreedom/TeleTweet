@@ -128,18 +128,33 @@ def help_handler(client, message: types.Message):
     bot.send_message(message.chat.id, userinfo, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 def send_ad_message(message):
-    messageNew = bot.send_message(
-        CONFIG_CHANNEL_ID, 
-        TODAY_CONFIG + FEEDBACK + CHANNEL + SIGN
-    )
-    time.sleep(1)
-    last_message = LAST_MESSAGE + f"{messageNew.id}"
-    bot.send_message(
-        CHANNEL_ID, 
-        TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
-    )
+    try:
+        messageNew = bot.send_message(
+            CONFIG_CHANNEL_ID, 
+            TODAY_CONFIG + FEEDBACK + CHANNEL + SIGN
+        )
+    except:
+        bot.send_message(
+            message.chat.id, 
+            "I can't send the message to this channel:" + CONFIG_CHANNEL_ID
+        )
+        return
     time.sleep(1)
 
+    try:
+        last_message = LAST_MESSAGE + f"{messageNew.id}"
+        bot.send_message(
+            CHANNEL_ID, 
+            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
+        )
+    except:
+        bot.send_message(
+            message.chat.id, 
+            "I can't send the message to this channel:" + CHANNEL_ID
+        )
+        return
+
+    time.sleep(1)
     try:
         bot.send_message(
             GROUP_ID, 
@@ -150,6 +165,7 @@ def send_ad_message(message):
             message.chat.id, 
             "I can't send the message to this group:" + GROUP_ID
         )
+        return
 
     result = send_tweet(messageNew)
     notify_result(result, message)
