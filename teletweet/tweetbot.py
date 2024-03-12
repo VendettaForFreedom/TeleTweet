@@ -139,10 +139,17 @@ def send_ad_message(message):
         TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
     )
     time.sleep(1)
-    bot.send_message(
-        GROUP_ID, 
-        TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
-    )
+
+    try:
+        bot.send_message(
+            GROUP_ID, 
+            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
+        )
+    except:
+        bot.send_message(
+            message.chat.id, 
+            "I can't send the message to this group:" + GROUP_ID
+        )
 
     result = send_tweet(messageNew)
     notify_result(result, message)
