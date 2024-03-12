@@ -80,19 +80,6 @@ def help_handler(client, message: types.Message):
     bot.send_message(message.chat.id, "Author: @BennyThink\nGitHub: https://github.com/tgbot-collection/TeleTweet")
 
 
-@bot.on_message(filters.command(["ping"]))
-def help_handler(client, message: types.Message):
-    message.reply_chat_action(enums.ChatAction.TYPING)
-
-    try:
-        userinfo = "Hello👋 " + get_me(message.chat.id) + "\n\n"
-    except TypeError:
-        userinfo = "Hello👋 unknown user! Want to `/sign_in` now?\n\n"
-
-    # info = get_runtime("botsrunner_teletweet_1")[:500]
-    bot.send_message(message.chat.id, userinfo, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
-
-
 @bot.on_message(filters.command(["delete"]))
 def delete_handler(client, message: types.Message):
     message.reply_chat_action(enums.ChatAction.TYPING)
@@ -126,6 +113,19 @@ def user_check(func):
                 bot.send_message(message.chat.id, "You're not allowed to use this bot.")
                 return
     return wrapper
+
+@bot.on_message(filters.command(["ping"]))
+@user_check
+def help_handler(client, message: types.Message):
+    message.reply_chat_action(enums.ChatAction.TYPING)
+
+    try:
+        userinfo = "Hello👋 " + get_me(message.chat.id) + "\n\n"
+    except TypeError:
+        userinfo = "Hello👋 unknown user! Want to `/sign_in` now?\n\n"
+
+    # info = get_runtime("botsrunner_teletweet_1")[:500]
+    bot.send_message(message.chat.id, userinfo, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 def send_ad_message(message):
     messageNew = bot.send_message(
