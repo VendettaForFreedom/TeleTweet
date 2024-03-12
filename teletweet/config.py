@@ -19,6 +19,7 @@ ACCESS_KEY = os.getenv("ACCESS_KEY", "")
 ACCESS_SECRET = os.getenv("ACCESS_SECRET", "")
 CONFIG_CHANNEL_ID = os.getenv("CONFIG_CHANNEL_ID", "")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
+GROUP_ID = os.getenv("GROUP_ID", "-1002002769427")
 # AUTH_STRING = os.getenv("AUTH_STRING", "")
 
 FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nتوییتر:\nhttps://twitter.com/FreeVPNHome"

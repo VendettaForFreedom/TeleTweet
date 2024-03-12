@@ -17,7 +17,7 @@ import requests
 from pyrogram import Client, enums, filters, types
 from tgbot_ping import get_runtime
 
-from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, FEEDBACK, TODAY_CONFIG, SIGN, LAST_MESSAGE, CHANNEL, tweet_format
+from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, FEEDBACK, TODAY_CONFIG, SIGN, LAST_MESSAGE, CHANNEL, GROUP_ID, tweet_format
 from helper import get_auth_data, sign_in, sign_off
 from tweet import (
     delete_tweet,
@@ -136,6 +136,11 @@ def send_ad_message(message):
     last_message = LAST_MESSAGE + f"{messageNew.id}"
     bot.send_message(
         CHANNEL_ID, 
+        TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
+    )
+    time.sleep(1)
+    bot.send_message(
+        GROUP_ID, 
         TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
     )
 
