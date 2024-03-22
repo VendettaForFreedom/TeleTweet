@@ -42,36 +42,10 @@ def start_handler(client, message: types.Message):
     if get_auth_data(message.chat.id):
         bot.send_message(message.chat.id, "Start by sending me a message?")
         return
-    msg = "Welcome to TeleTweet. " "This bot will connect you from Telegram Bot to Twitter. " "Want to get started now? Type /sign_in now!"
+    msg = "Welcome to TeleTweet. " "This bot will connect you from Telegram Bot to Twitter. "
     if ALLOW_USERS != [""]:
         msg += "\n\nTHIS BOT IS ONLY AVAILABLE TO CERTAIN USERS. Contact creator for help."
     bot.send_message(message.chat.id, msg)
-
-
-@bot.on_message(filters.command(["sign_in"]))
-def sign_in_handler(client, message: types.Message):
-    if get_auth_data(message.chat.id):
-        bot.send_message(message.chat.id, "You have already signed in, no need to do it again.")
-        return
-    message.reply_chat_action(enums.ChatAction.TYPING)
-    # msg = "Send auth code to me"
-    msg = "Click this [link](https://teletweet.app) to login in you twitter." " When your login in is done, send auth code back to me"
-    bot.send_message(message.chat.id, msg, enums.ParseMode.MARKDOWN)
-    STEP[message.chat.id] = "sign_in"
-
-
-@bot.on_message(filters.command(["sign_off"]))
-def sign_off_handler(client, message: types.Message):
-    message.reply_chat_action(enums.ChatAction.TYPING)
-    if not get_auth_data(message.chat.id):
-        bot.send_message(message.chat.id, "You haven't signed in yet.")
-        return
-
-    sign_off(str(message.chat.id))
-    msg = (
-        "I'm sorry to see you go. I have delete your oauth token." "By the way, you could also check [this link](https://twitter.com/settings/connected_apps)."
-    )
-    bot.send_message(message.chat.id, msg, enums.ParseMode.MARKDOWN)
 
 
 @bot.on_message(filters.command(["help"]))
@@ -177,7 +151,7 @@ def handle_message(message, send_ad=True):
         send_ad_message(message)
         for part in parts:
             if len(part) > 10:
-                bot.send_message(CONFIG_CHANNEL_ID, part + CHANNEL + SIGN)
+                bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + SIGN)
                 time.sleep(1)
     else:
         bot.send_message(CONFIG_CHANNEL_ID, text + CHANNEL + SIGN)
