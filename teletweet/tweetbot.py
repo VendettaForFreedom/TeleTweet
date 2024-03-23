@@ -154,7 +154,10 @@ def handle_message(message, send_ad=True):
                 bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + SIGN)
                 time.sleep(1)
     else:
-        bot.send_message(CONFIG_CHANNEL_ID, text + CHANNEL + SIGN)
+        try:
+            bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + SIGN)
+        except:
+            bot.send_message(message.chat.id, "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID)
 
 
 @bot.on_message(filters.command(["single_config"]))
@@ -192,11 +195,11 @@ def tweet_text_handler(client, message: types.Message):
     if STEP.get(message.chat.id) == "single_config":
         handle_message(message, False)
         STEP.pop(message.chat.id)
-        return
     elif STEP.get(message.chat.id) == "multiple_configs":
         handle_message(message)
         STEP.pop(message.chat.id)
-        return
+    else:
+        bot.send_message(message.chat.id, "Send me a command first.")
 
 @bot.on_message(filters.media_group)
 @user_check

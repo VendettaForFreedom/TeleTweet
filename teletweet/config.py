@@ -30,4 +30,5 @@ SIGN = """به امید آزادی #توماج_صالحی\n#مهسا_امینی\
 LAST_MESSAGE = ":\nhttps://t.me/FreeVPNHomesConfigs/"
 
 tweet_format = "https://twitter.com/{screen_name}/status/{id}"
-ALLOW_USERS = os.getenv("ALLOW_USERS", "").split(",")
+# remove ALLOW_USERS white spaces then split by comma
+ALLOW_USERS = os.getenv("ALLOW_USERS", "").replace(" ", "").split(",") if os.getenv("ALLOW_USERS", "") else [""]
