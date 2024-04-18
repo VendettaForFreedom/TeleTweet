@@ -22,7 +22,7 @@ CHANNEL_ID = os.getenv("CHANNEL_ID", "")
 GROUP_ID = os.getenv("GROUP_ID", "")
 # AUTH_STRING = os.getenv("AUTH_STRING", "")
 
-FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nتوییتر:\nhttps://twitter.com/FreeVPNHome"
+FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nتوییتر:\nhttps://twitter.com/FreeVPNHomes"
 TODAY_CONFIG = "کانفیگ های امروز"
 CHANNEL_URL = """\n\nhttps://t.me/FreeVPNHomes\n\n"""
 CHANNEL = """\n\n@FreeVPNHomes\n\n"""
@@ -30,4 +30,5 @@ SIGN = """به امید آزادی #توماج_صالحی\n#مهسا_امینی\
 LAST_MESSAGE = ":\nhttps://t.me/FreeVPNHomesConfigs/"
 
 tweet_format = "https://twitter.com/{screen_name}/status/{id}"
-ALLOW_USERS = os.getenv("ALLOW_USERS", "").split(",")
+# remove ALLOW_USERS white spaces then split by comma
+ALLOW_USERS = os.getenv("ALLOW_USERS", "").replace(" ", "").split(",") if os.getenv("ALLOW_USERS", "") else [""]
