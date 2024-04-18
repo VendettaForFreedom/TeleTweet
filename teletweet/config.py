@@ -22,7 +22,7 @@ CHANNEL_ID = os.getenv("CHANNEL_ID", "")
 GROUP_ID = os.getenv("GROUP_ID", "")
 # AUTH_STRING = os.getenv("AUTH_STRING", "")
 
-FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nتوییتر:\nhttps://twitter.com/FreeVPNHome"
+FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nتوییتر:\nhttps://twitter.com/FreeVPNHomes"
 TODAY_CONFIG = "کانفیگ های امروز"
 CHANNEL_URL = """\n\nhttps://t.me/FreeVPNHomes\n\n"""
 CHANNEL = """\n\n@FreeVPNHomes\n\n"""
