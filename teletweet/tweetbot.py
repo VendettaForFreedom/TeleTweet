@@ -16,7 +16,8 @@ from threading import Lock
 import requests
 from pyrogram import Client, enums, filters, types
 from tgbot_ping import get_runtime
-from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, FEEDBACK, TODAY_CONFIG, SIGN, LAST_MESSAGE, tweet_format
+
+from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, FEEDBACK, TODAY_CONFIG, SIGN, LAST_MESSAGE, CHANNEL, GROUP_ID, tweet_format
 from helper import get_auth_data, sign_in, sign_off
 from tweet import (
     delete_tweet,
@@ -41,55 +42,16 @@ def start_handler(client, message: types.Message):
     if get_auth_data(message.chat.id):
         bot.send_message(message.chat.id, "Start by sending me a message?")
         return
-    msg = "Welcome to TeleTweet. " "This bot will connect you from Telegram Bot to Twitter. " "Want to get started now? Type /sign_in now!"
+    msg = "Welcome to TeleTweet. " "This bot will connect you from Telegram Bot to Twitter. "
     if ALLOW_USERS != [""]:
         msg += "\n\nTHIS BOT IS ONLY AVAILABLE TO CERTAIN USERS. Contact creator for help."
     bot.send_message(message.chat.id, msg)
-
-
-@bot.on_message(filters.command(["sign_in"]))
-def sign_in_handler(client, message: types.Message):
-    if get_auth_data(message.chat.id):
-        bot.send_message(message.chat.id, "You have already signed in, no need to do it again.")
-        return
-    message.reply_chat_action(enums.ChatAction.TYPING)
-    # msg = "Send auth code to me"
-    msg = "Click this [link](https://teletweet.app) to login in you twitter." " When your login in is done, send auth code back to me"
-    bot.send_message(message.chat.id, msg, enums.ParseMode.MARKDOWN)
-    STEP[message.chat.id] = "sign_in"
-
-
-@bot.on_message(filters.command(["sign_off"]))
-def sign_off_handler(client, message: types.Message):
-    message.reply_chat_action(enums.ChatAction.TYPING)
-    if not get_auth_data(message.chat.id):
-        bot.send_message(message.chat.id, "You haven't signed in yet.")
-        return
-
-    sign_off(str(message.chat.id))
-    msg = (
-        "I'm sorry to see you go. I have delete your oauth token." "By the way, you could also check [this link](https://twitter.com/settings/connected_apps)."
-    )
-    bot.send_message(message.chat.id, msg, enums.ParseMode.MARKDOWN)
 
 
 @bot.on_message(filters.command(["help"]))
 def help_handler(client, message: types.Message):
     message.reply_chat_action(enums.ChatAction.TYPING)
     bot.send_message(message.chat.id, "Author: @BennyThink\nGitHub: https://github.com/tgbot-collection/TeleTweet")
-
-
-@bot.on_message(filters.command(["ping"]))
-def help_handler(client, message: types.Message):
-    message.reply_chat_action(enums.ChatAction.TYPING)
-
-    try:
-        userinfo = "Hello👋 " + get_me(message.chat.id) + "\n\n"
-    except TypeError:
-        userinfo = "Hello👋 unknown user! Want to `/sign_in` now?\n\n"
-
-    info = get_runtime("botsrunner_teletweet_1")[:500]
-    bot.send_message(message.chat.id, userinfo + info, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
 @bot.on_message(filters.command(["delete"]))
@@ -126,20 +88,60 @@ def user_check(func):
                 return
     return wrapper
 
-def send_ad_message(message):
-    messageNew = bot.send_message(
-        CONFIG_CHANNEL_ID, 
-        TODAY_CONFIG + FEEDBACK + SIGN
-    )
-    time.sleep(1)
-    last_message = LAST_MESSAGE + f"{messageNew.id}"
-    bot.send_message(
-        CHANNEL_ID, 
-        TODAY_CONFIG + last_message + FEEDBACK + SIGN
-    )
+@bot.on_message(filters.command(["ping"]))
+@user_check
+def help_handler(client, message: types.Message):
+    message.reply_chat_action(enums.ChatAction.TYPING)
 
-    # result = send_tweet(messageNew)
-    # notify_result(result, message)
+    try:
+        userinfo = "Hello👋 " + get_me(message.chat.id) + "\n\n"
+    except TypeError:
+        userinfo = "Hello👋 unknown user! Want to `/sign_in` now?\n\n"
+
+    # info = get_runtime("botsrunner_teletweet_1")[:500]
+    bot.send_message(message.chat.id, userinfo, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
+
+def send_ad_message(message):
+    try:
+        messageNew = bot.send_message(
+            CONFIG_CHANNEL_ID, 
+            TODAY_CONFIG + FEEDBACK + CHANNEL + SIGN
+        )
+    except:
+        bot.send_message(
+            message.chat.id, 
+            "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID
+        )
+        return
+    time.sleep(1)
+
+    try:
+        last_message = LAST_MESSAGE + f"{messageNew.id}"
+        bot.send_message(
+            CHANNEL_ID, 
+            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
+        )
+    except:
+        bot.send_message(
+            message.chat.id, 
+            "I can't send the message to the main channel:" + CHANNEL_ID
+        )
+        return
+
+    time.sleep(1)
+    try:
+        bot.send_message(
+            GROUP_ID, 
+            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
+        )
+    except:
+        bot.send_message(
+            message.chat.id, 
+            "I can't send the message to the group:" + GROUP_ID
+        )
+
+    result = send_tweet(messageNew)
+    notify_result(result, message)
     return messageNew
 
 def handle_message(message, send_ad=True):
@@ -149,10 +151,13 @@ def handle_message(message, send_ad=True):
         send_ad_message(message)
         for part in parts:
             if len(part) > 10:
-                bot.send_message(CONFIG_CHANNEL_ID, part + SIGN)
+                bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + SIGN)
                 time.sleep(1)
     else:
-        bot.send_message(CONFIG_CHANNEL_ID, text + SIGN)
+        try:
+            bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + SIGN)
+        except:
+            bot.send_message(message.chat.id, "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID)
 
 
 @bot.on_message(filters.command(["single_config"]))
@@ -190,11 +195,11 @@ def tweet_text_handler(client, message: types.Message):
     if STEP.get(message.chat.id) == "single_config":
         handle_message(message, False)
         STEP.pop(message.chat.id)
-        return
     elif STEP.get(message.chat.id) == "multiple_configs":
         handle_message(message)
         STEP.pop(message.chat.id)
-        return
+    else:
+        bot.send_message(message.chat.id, "Send me a command first.")
 
 @bot.on_message(filters.media_group)
 @user_check
