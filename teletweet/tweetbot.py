@@ -116,17 +116,17 @@ def help_handler(client, message: types.Message):
     # info = get_runtime("botsrunner_teletweet_1")[:500]
     bot.send_message(message.chat.id, userinfo, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
-@bot.on_message(filters.chat(SOURCE_CHANNEL_ID) & filters.incoming)
-def work(_:Client, message:types.Message):
-    caption = None
-    msg = None
+@bot.on_message(filters.chat(SOURCE_CHANNEL_ID) & filters.texts)
+def auto_ad_message(message:types.Message):
+    content = message.text or message.caption
     try:
-        if caption:
-            message.copy(CHANNEL_ID, caption=caption, parse_mode=enums.ParseMode.MARKDOWN)
-        elif msg:
-            bot.send_message(CHANNEL_ID, msg, parse_mode=enums.ParseMode.MARKDOWN)
-        else:
-            message.copy(CHANNEL_ID)
+        bot.send_message(
+            CHANNEL_ID, 
+            content[:200] + "...\n" +
+            "https://t.me/javeednaman/" + message.chat.id + "\n" +
+            SIGN, 
+            parse_mode=enums.ParseMode.MARKDOWN
+        )
     except Exception as e:
         logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
 
