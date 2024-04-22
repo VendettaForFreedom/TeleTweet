@@ -13,14 +13,26 @@ import tempfile
 import time
 from threading import Lock
 
-import asyncio
-
-from telegram_channel_duplicator.telegram_channel_duplicator.duplicator import Duplicator
-
 import requests
 from pyrogram import Client, enums, filters, types
 
-from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, FEEDBACK, TODAY_CONFIG, SIGN, LAST_MESSAGE, CHANNEL, GROUP_ID, tweet_format
+from config import (
+    APP_HASH, 
+    APP_ID, 
+    BOT_TOKEN, 
+    CONFIG_CHANNEL_ID, 
+    CHANNEL_ID, 
+    SOURCE_CHANNEL_ID,
+    ALLOW_USERS, 
+    FEEDBACK, 
+    TODAY_CONFIG, 
+    SIGN, 
+    LAST_MESSAGE, 
+    CHANNEL, 
+    GROUP_ID, 
+    tweet_format
+)
+
 from helper import get_auth_data, sign_in, sign_off
 from tweet import (
     delete_tweet,
@@ -104,11 +116,21 @@ def help_handler(client, message: types.Message):
     # info = get_runtime("botsrunner_teletweet_1")[:500]
     bot.send_message(message.chat.id, userinfo, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
-async def send_ad_message(message):
+@bot.on_message(filters.chat(SOURCE_CHANNEL_ID) & filters.incoming)
+def work(_:Client, message:types.Message):
+    caption = None
+    msg = None
+    try:
+        if caption:
+            message.copy(CHANNEL_ID, caption=caption, parse_mode=enums.ParseMode.MARKDOWN)
+        elif msg:
+            bot.send_message(CHANNEL_ID, msg, parse_mode=enums.ParseMode.MARKDOWN)
+        else:
+            message.copy(CHANNEL_ID)
+    except Exception as e:
+        logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
 
-    duplicator = Duplicator()
-    await duplicator.start()
-
+def send_ad_message(message):
     try:
         messageNew = bot.send_message(
             CONFIG_CHANNEL_ID, 
@@ -155,8 +177,7 @@ def handle_message(message, send_ad=True):
     text = message.text or message.caption
     parts = text.split("\n")
     if send_ad:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(send_ad_message(message))
+        send_ad_message(message)
         for part in parts:
             if len(part) > 10:
                 bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + SIGN)
