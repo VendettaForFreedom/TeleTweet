@@ -117,31 +117,36 @@ def help_handler(client, message: types.Message):
     bot.send_message(message.chat.id, userinfo, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 def generate_tags():
-    # read strings from a file and get 3 items randomly and combine them
     with open("tags.txt", "r") as f:
-        strings = f.readlines()
+        strings = f.read().splitlines() 
         import random
 
         random.shuffle(strings)
         STRINGS = strings[:3]
         f.close()
-        return "".join(STRINGS)
+        return "\n".join(STRINGS)
+    
+def truncate_content(content):
+    if len(content) > 200:
+        return content[:200] + "..."
+    else:
+        return content
 
 @bot.on_message(filters.incoming)
 def auto_ad_message(client, message:types.Message):
-    logging.info("Message received from %s", message.chat.id)
-    # if message.chat.id == SOURCE_CHANNEL_ID:
-    content = message.text or message.caption
-    try:
-        bot.send_message(
-            CHANNEL_ID, 
-            content[:200] + "...\n" +
-            "https://t.me/javeednaman/" + f"{message.chat.id}" + "\n" +
-            generate_tags() or SIGN, 
-            parse_mode=enums.ParseMode.MARKDOWN
-        )
-    except Exception as e:
-        logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
+    if message.chat.id == SOURCE_CHANNEL_ID:
+        logging.info("Message received from %s", message.chat.id)
+        content = message.text or message.caption
+        try:
+            bot.send_message(
+                CHANNEL_ID, 
+                truncate_content(content) + "\n" +
+                "https://t.me/javeednaman/" + f"{message.id}" + "\n" +
+                generate_tags() or SIGN, 
+                parse_mode=enums.ParseMode.MARKDOWN
+            )
+        except Exception as e:
+            logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
 
 def send_ad_message(message):
     try:
