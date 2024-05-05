@@ -30,6 +30,7 @@ from config import (
     SIGN, 
     CONFIG_CHANNEL, 
     SOURCE_CHANNEL,
+    CONTINUE_READING,
     CHANNEL, 
     GROUP_ID, 
     tweet_format
@@ -152,11 +153,11 @@ def auto_ad_message(client, message:types.Message):
         if (message.photo is not None and (Multi_message[SOURCE_CHANNEL_ID].text is not None or Multi_message[SOURCE_CHANNEL_ID].caption is not None)):
             content = Multi_message[SOURCE_CHANNEL_ID].text or Multi_message[SOURCE_CHANNEL_ID].caption
             picture = message.photo.file_id
-            chat_id = message.forward_from_message_id
+            chat_id = Multi_message[SOURCE_CHANNEL_ID].forward_from_message_id
         elif (Multi_message[SOURCE_CHANNEL_ID].photo is not None and (message.text is not None or message.caption is not None)):
             content = message.text or message.caption
             picture = Multi_message[SOURCE_CHANNEL_ID].photo.file_id
-            chat_id = Multi_message[SOURCE_CHANNEL_ID].forward_from_message_id
+            chat_id = message.forward_from_message_id
         else:
             return
         
@@ -165,7 +166,8 @@ def auto_ad_message(client, message:types.Message):
             bot.send_photo(
                 CHANNEL_ID, 
                 picture,
-                truncate_content(content) + "\n" +
+                truncate_content(content) + "\n" + 
+                CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
                 CHANNEL + generate_tags() or SIGN, 
                 parse_mode=enums.ParseMode.MARKDOWN
