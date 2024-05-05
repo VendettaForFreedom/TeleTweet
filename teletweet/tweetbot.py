@@ -144,21 +144,27 @@ def auto_ad_message(client, message:types.Message):
         logging.info("Message received from %s", message.chat.id)
         if not Multi_message or not is_multi_message(message):
             Multi_message[SOURCE_CHANNEL_ID] = message
-        elif ((message.photo is not None and (Multi_message[SOURCE_CHANNEL_ID].text is not None or Multi_message[SOURCE_CHANNEL_ID].caption is not None)) or 
-            (Multi_message[SOURCE_CHANNEL_ID].photo is not None and (message.text is not None or message.caption is not None))):
+            return
+        
+        if (message.photo is not None and (Multi_message[SOURCE_CHANNEL_ID].text is not None or Multi_message[SOURCE_CHANNEL_ID].caption is not None)):
+            content = Multi_message[SOURCE_CHANNEL_ID].text or Multi_message[SOURCE_CHANNEL_ID].caption
+            picture = message.photo.file_id
+        elif (Multi_message[SOURCE_CHANNEL_ID].photo is not None and (message.text is not None or message.caption is not None)):
             content = message.text or message.caption
-            try:
-                bot.send_photo(
-                    CHANNEL_ID, 
-                    message.photo.file_id,
-                    truncate_content(content) + "\n" +
-                    SOURCE_CHANNEL + f"{message.id}" + "\n" +
-                    FEEDBACK + CHANNEL + generate_tags() or SIGN, 
-                    parse_mode=enums.ParseMode.MARKDOWN
-                )
-                Multi_message.pop(SOURCE_CHANNEL_ID)
-            except Exception as e:
-                logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
+            picture = Multi_message[SOURCE_CHANNEL_ID].photo.file_id
+
+        try:
+            bot.send_photo(
+                CHANNEL_ID, 
+                picture,
+                truncate_content(content) + "\n" +
+                SOURCE_CHANNEL + f"{message.id}" + "\n" +
+                FEEDBACK + CHANNEL + generate_tags() or SIGN, 
+                parse_mode=enums.ParseMode.MARKDOWN
+            )
+            Multi_message.pop(SOURCE_CHANNEL_ID)
+        except Exception as e:
+            logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
 
 def send_ad_message(message):
     try:
