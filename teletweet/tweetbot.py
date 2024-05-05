@@ -136,7 +136,7 @@ def auto_ad_message(client, message:types.Message):
         bot.send_message(
             CHANNEL_ID, 
             content[:200] + "...\n" +
-            "https://t.me/javeednaman/" + message.chat.id + "\n" +
+            "https://t.me/javeednaman/" + f"{message.chat.id}" + "\n" +
             generate_tags() or SIGN, 
             parse_mode=enums.ParseMode.MARKDOWN
         )
