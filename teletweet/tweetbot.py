@@ -139,8 +139,9 @@ def auto_ad_message(client, message:types.Message):
         logging.info("Message received from %s", message.chat.id)
         content = message.text or message.caption
         try:
-            bot.send_message(
+            bot.send_photo(
                 CHANNEL_ID, 
+                message.photo.file_id,
                 truncate_content(content) + "\n" +
                 SOURCE_CHANNEL + f"{message.id}" + "\n" +
                 FEEDBACK + CHANNEL + generate_tags() or SIGN, 

@@ -24,12 +24,12 @@ GROUP_ID = os.getenv("GROUP_ID", "")
 # AUTH_STRING = os.getenv("AUTH_STRING", "")
 
 FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nتوییتر:\nhttps://twitter.com/FreeVPNHomes"
-TODAY_CONFIG = "کانفیگ های امروز"
+TODAY_CONFIG = "کانفیگ های امروز:"
 CHANNEL_URL = """\n\nhttps://t.me/FreeVPNHomes\n\n"""
 CHANNEL = """\n\n@FreeVPNHomes\n\n"""
 SIGN = """به امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
-CONFIG_CHANNEL = ":\nhttps://t.me/FreeVPNHomesConfigs/"
-SOURCE_CHANNEL = "https://t.me/javeednaman"
+CONFIG_CHANNEL = "\nhttps://t.me/FreeVPNHomesConfigs/"
+SOURCE_CHANNEL = "\nhttps://t.me/javeednaman/"
 
 tweet_format = "https://twitter.com/{screen_name}/status/{id}"
 # remove ALLOW_USERS white spaces then split by comma
