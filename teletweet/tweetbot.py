@@ -134,7 +134,7 @@ def truncate_content(content):
 
 @bot.on_message(filters.incoming)
 def auto_ad_message(client, message:types.Message):
-    if message.chat.id == SOURCE_CHANNEL_ID:
+    if str(message.chat.id) == SOURCE_CHANNEL_ID:
         logging.info("Message received from %s", message.chat.id)
         content = message.text or message.caption
         try:
