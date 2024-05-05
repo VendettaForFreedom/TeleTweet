@@ -28,7 +28,8 @@ TODAY_CONFIG = "کانفیگ های امروز"
 CHANNEL_URL = """\n\nhttps://t.me/FreeVPNHomes\n\n"""
 CHANNEL = """\n\n@FreeVPNHomes\n\n"""
 SIGN = """به امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
-LAST_MESSAGE = ":\nhttps://t.me/FreeVPNHomesConfigs/"
+CONFIG_CHANNEL = ":\nhttps://t.me/FreeVPNHomesConfigs/"
+SOURCE_CHANNEL = "https://t.me/javeednaman"
 
 tweet_format = "https://twitter.com/{screen_name}/status/{id}"
 # remove ALLOW_USERS white spaces then split by comma

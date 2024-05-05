@@ -27,7 +27,8 @@ from config import (
     FEEDBACK, 
     TODAY_CONFIG, 
     SIGN, 
-    LAST_MESSAGE, 
+    CONFIG_CHANNEL, 
+    SOURCE_CHANNEL,
     CHANNEL, 
     GROUP_ID, 
     tweet_format
@@ -141,8 +142,8 @@ def auto_ad_message(client, message:types.Message):
             bot.send_message(
                 CHANNEL_ID, 
                 truncate_content(content) + "\n" +
-                "https://t.me/javeednaman/" + f"{message.id}" + "\n" +
-                generate_tags() or SIGN, 
+                SOURCE_CHANNEL + f"{message.id}" + "\n" +
+                FEEDBACK + CHANNEL + generate_tags() or SIGN, 
                 parse_mode=enums.ParseMode.MARKDOWN
             )
         except Exception as e:
@@ -163,10 +164,10 @@ def send_ad_message(message):
     time.sleep(1)
 
     try:
-        last_message = LAST_MESSAGE + f"{messageNew.id}"
+        config_channel = CONFIG_CHANNEL + f"{messageNew.id}"
         bot.send_message(
             CHANNEL_ID, 
-            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + generate_tags() or SIGN
+            TODAY_CONFIG + config_channel + FEEDBACK + CHANNEL + generate_tags() or SIGN
         )
     except:
         bot.send_message(
@@ -179,7 +180,7 @@ def send_ad_message(message):
     try:
         bot.send_message(
             GROUP_ID, 
-            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + generate_tags() or SIGN
+            TODAY_CONFIG + CONFIG_CHANNEL + FEEDBACK + CHANNEL + generate_tags() or SIGN
         )
     except:
         bot.send_message(
