@@ -166,7 +166,7 @@ def auto_ad_message(client, message:types.Message):
             bot.send_photo(
                 CHANNEL_ID, 
                 picture,
-                truncate_content(content) + "\n" + 
+                truncate_content(content) + "\n\n" + 
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
                 CHANNEL + generate_tags() or SIGN, 
