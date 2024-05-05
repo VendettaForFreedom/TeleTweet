@@ -146,13 +146,17 @@ def auto_ad_message(client, message:types.Message):
             Multi_message[SOURCE_CHANNEL_ID] = message
             return
         
+        content = ""
+        picture = ""
         if (message.photo is not None and (Multi_message[SOURCE_CHANNEL_ID].text is not None or Multi_message[SOURCE_CHANNEL_ID].caption is not None)):
             content = Multi_message[SOURCE_CHANNEL_ID].text or Multi_message[SOURCE_CHANNEL_ID].caption
             picture = message.photo.file_id
         elif (Multi_message[SOURCE_CHANNEL_ID].photo is not None and (message.text is not None or message.caption is not None)):
             content = message.text or message.caption
             picture = Multi_message[SOURCE_CHANNEL_ID].photo.file_id
-
+        else:
+            return
+        
         try:
             bot.send_photo(
                 CHANNEL_ID, 
@@ -162,7 +166,7 @@ def auto_ad_message(client, message:types.Message):
                 FEEDBACK + CHANNEL + generate_tags() or SIGN, 
                 parse_mode=enums.ParseMode.MARKDOWN
             )
-            Multi_message.pop(SOURCE_CHANNEL_ID)
+            del Multi_message[SOURCE_CHANNEL_ID]
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
 
