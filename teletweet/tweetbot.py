@@ -144,9 +144,8 @@ def auto_ad_message(client, message:types.Message):
         logging.info("Message received from %s", message.chat.id)
         if not Multi_message or not is_multi_message(message):
             Multi_message[SOURCE_CHANNEL_ID] = message
-        elif ((message.photo is not None & (Multi_message[SOURCE_CHANNEL_ID].text is not None or Multi_message[SOURCE_CHANNEL_ID].caption is not None)) or 
-            (Multi_message[SOURCE_CHANNEL_ID].photo is not None & (message.text is not None or message.caption is not None))):
-
+        elif ((message.photo is not None and (Multi_message[SOURCE_CHANNEL_ID].text is not None or Multi_message[SOURCE_CHANNEL_ID].caption is not None)) or 
+            (Multi_message[SOURCE_CHANNEL_ID].photo is not None and (message.text is not None or message.caption is not None))):
             content = message.text or message.caption
             try:
                 bot.send_photo(
