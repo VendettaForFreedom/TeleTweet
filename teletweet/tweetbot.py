@@ -130,18 +130,18 @@ def generate_tags():
 @bot.on_message(filters.incoming)
 def auto_ad_message(client, message:types.Message):
     logging.info("Message received from %s", message.chat.id)
-    if message.chat.id == SOURCE_CHANNEL_ID:
-        content = message.text or message.caption
-        try:
-            bot.send_message(
-                CHANNEL_ID, 
-                content[:200] + "...\n" +
-                "https://t.me/javeednaman/" + message.chat.id + "\n" +
-                generate_tags() or SIGN, 
-                parse_mode=enums.ParseMode.MARKDOWN
-            )
-        except Exception as e:
-            logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
+    # if message.chat.id == SOURCE_CHANNEL_ID:
+    content = message.text or message.caption
+    try:
+        bot.send_message(
+            CHANNEL_ID, 
+            content[:200] + "...\n" +
+            "https://t.me/javeednaman/" + message.chat.id + "\n" +
+            generate_tags() or SIGN, 
+            parse_mode=enums.ParseMode.MARKDOWN
+        )
+    except Exception as e:
+        logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
 
 def send_ad_message(message):
     try:
