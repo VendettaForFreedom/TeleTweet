@@ -125,7 +125,7 @@ def generate_tags():
         random.shuffle(strings)
         STRINGS = strings[:3]
         f.close()
-        return "\n".join(STRINGS)
+        return "".join(STRINGS)
 
 @bot.on_message(filters.chat(SOURCE_CHANNEL_ID) & filters.text)
 def auto_ad_message(message:types.Message):
