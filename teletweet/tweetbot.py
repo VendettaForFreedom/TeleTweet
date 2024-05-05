@@ -116,7 +116,18 @@ def help_handler(client, message: types.Message):
     # info = get_runtime("botsrunner_teletweet_1")[:500]
     bot.send_message(message.chat.id, userinfo, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
-@bot.on_message(filters.chat(SOURCE_CHANNEL_ID) & filters.texts)
+def generate_tags():
+    # read strings from a file and get 3 items randomly and combine them
+    with open("tags.txt", "r") as f:
+        strings = f.readlines()
+        import random
+
+        random.shuffle(strings)
+        STRINGS = strings[:3]
+        f.close()
+        return "\n".join(STRINGS)
+
+@bot.on_message(filters.chat(SOURCE_CHANNEL_ID) & filters.text)
 def auto_ad_message(message:types.Message):
     content = message.text or message.caption
     try:
@@ -124,7 +135,7 @@ def auto_ad_message(message:types.Message):
             CHANNEL_ID, 
             content[:200] + "...\n" +
             "https://t.me/javeednaman/" + message.chat.id + "\n" +
-            SIGN, 
+            generate_tags() or SIGN, 
             parse_mode=enums.ParseMode.MARKDOWN
         )
     except Exception as e:
@@ -134,7 +145,7 @@ def send_ad_message(message):
     try:
         messageNew = bot.send_message(
             CONFIG_CHANNEL_ID, 
-            TODAY_CONFIG + FEEDBACK + CHANNEL + SIGN
+            TODAY_CONFIG + FEEDBACK + CHANNEL + generate_tags() or SIGN
         )
     except:
         bot.send_message(
@@ -148,7 +159,7 @@ def send_ad_message(message):
         last_message = LAST_MESSAGE + f"{messageNew.id}"
         bot.send_message(
             CHANNEL_ID, 
-            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
+            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + generate_tags() or SIGN
         )
     except:
         bot.send_message(
@@ -161,7 +172,7 @@ def send_ad_message(message):
     try:
         bot.send_message(
             GROUP_ID, 
-            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
+            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + generate_tags() or SIGN
         )
     except:
         bot.send_message(
@@ -180,11 +191,11 @@ def handle_message(message, send_ad=True):
         send_ad_message(message)
         for part in parts:
             if len(part) > 10:
-                bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + SIGN)
+                bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + generate_tags() or SIGN)
                 time.sleep(1)
     else:
         try:
-            bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + SIGN)
+            bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + generate_tags() or SIGN)
         except:
             bot.send_message(message.chat.id, "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID)
 
