@@ -50,7 +50,7 @@ media_group = {}
 bot = Client("teletweet", APP_ID, APP_HASH, bot_token=BOT_TOKEN)
 
 STEP = {}
-
+Multi_message = {}
 
 @bot.on_message(filters.command(["start"]))
 def start_handler(client, message: types.Message):
@@ -137,18 +137,24 @@ def truncate_content(content):
 def auto_ad_message(client, message:types.Message):
     if str(message.chat.id) == SOURCE_CHANNEL_ID:
         logging.info("Message received from %s", message.chat.id)
-        content = message.text or message.caption
-        try:
-            bot.send_photo(
-                CHANNEL_ID, 
-                message.photo.file_id,
-                truncate_content(content) + "\n" +
-                SOURCE_CHANNEL + f"{message.id}" + "\n" +
-                FEEDBACK + CHANNEL + generate_tags() or SIGN, 
-                parse_mode=enums.ParseMode.MARKDOWN
-            )
-        except Exception as e:
-            logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
+        if not Multi_message:
+            Multi_message[SOURCE_CHANNEL_ID] = message
+        elif ((message.photo & (Multi_message[SOURCE_CHANNEL_ID].text or Multi_message[SOURCE_CHANNEL_ID].caption)) or 
+            (Multi_message[SOURCE_CHANNEL_ID].photo & (message.text or message.caption))):
+
+            content = message.text or message.caption
+            try:
+                bot.send_photo(
+                    CHANNEL_ID, 
+                    message.photo.file_id,
+                    truncate_content(content) + "\n" +
+                    SOURCE_CHANNEL + f"{message.id}" + "\n" +
+                    FEEDBACK + CHANNEL + generate_tags() or SIGN, 
+                    parse_mode=enums.ParseMode.MARKDOWN
+                )
+                Multi_message.pop(SOURCE_CHANNEL_ID)
+            except Exception as e:
+                logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
 
 def send_ad_message(message):
     try:
