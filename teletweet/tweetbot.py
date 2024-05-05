@@ -11,6 +11,7 @@ import logging
 import os
 import tempfile
 import time
+from datetime import timedelta
 from threading import Lock
 
 import requests
@@ -133,14 +134,18 @@ def truncate_content(content):
     else:
         return content
 
+def is_multi_message(message):
+    time_difference = message.date - Multi_message[SOURCE_CHANNEL_ID].date
+    return time_difference < timedelta(minutes=1)
+
 @bot.on_message(filters.incoming)
 def auto_ad_message(client, message:types.Message):
     if str(message.chat.id) == SOURCE_CHANNEL_ID:
         logging.info("Message received from %s", message.chat.id)
-        if not Multi_message:
+        if not Multi_message or not is_multi_message(message):
             Multi_message[SOURCE_CHANNEL_ID] = message
-        elif ((message.photo & (Multi_message[SOURCE_CHANNEL_ID].text or Multi_message[SOURCE_CHANNEL_ID].caption)) or 
-            (Multi_message[SOURCE_CHANNEL_ID].photo & (message.text or message.caption))):
+        elif ((message.photo is not None & (Multi_message[SOURCE_CHANNEL_ID].text is not None or Multi_message[SOURCE_CHANNEL_ID].caption is not None)) or 
+            (Multi_message[SOURCE_CHANNEL_ID].photo is not None & (message.text is not None or message.caption is not None))):
 
             content = message.text or message.caption
             try:
