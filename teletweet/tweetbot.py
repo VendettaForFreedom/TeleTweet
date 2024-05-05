@@ -158,6 +158,7 @@ def auto_ad_message(client, message:types.Message):
             return
         
         try:
+            del Multi_message[SOURCE_CHANNEL_ID]
             bot.send_photo(
                 CHANNEL_ID, 
                 picture,
@@ -166,7 +167,6 @@ def auto_ad_message(client, message:types.Message):
                 FEEDBACK + CHANNEL + generate_tags() or SIGN, 
                 parse_mode=enums.ParseMode.MARKDOWN
             )
-            del Multi_message[SOURCE_CHANNEL_ID]
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
 
