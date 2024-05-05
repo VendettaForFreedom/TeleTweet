@@ -152,11 +152,11 @@ def auto_ad_message(client, message:types.Message):
         if (message.photo is not None and (Multi_message[SOURCE_CHANNEL_ID].text is not None or Multi_message[SOURCE_CHANNEL_ID].caption is not None)):
             content = Multi_message[SOURCE_CHANNEL_ID].text or Multi_message[SOURCE_CHANNEL_ID].caption
             picture = message.photo.file_id
-            chat_id = message.forward_from_chat.id
+            chat_id = message.forward_from_message_id
         elif (Multi_message[SOURCE_CHANNEL_ID].photo is not None and (message.text is not None or message.caption is not None)):
             content = message.text or message.caption
             picture = Multi_message[SOURCE_CHANNEL_ID].photo.file_id
-            chat_id = Multi_message[SOURCE_CHANNEL_ID].forward_from_chat.id
+            chat_id = Multi_message[SOURCE_CHANNEL_ID].forward_from_message_id
         else:
             return
         
