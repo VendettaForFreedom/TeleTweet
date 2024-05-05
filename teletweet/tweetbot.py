@@ -128,7 +128,7 @@ def generate_tags():
         return "".join(STRINGS)
 
 @bot.on_message(filters.incoming)
-def auto_ad_message(message:types.Message):
+def auto_ad_message(client, message:types.Message):
     logging.info("Message received from %s", message.chat.id)
     if message.chat.id == SOURCE_CHANNEL_ID:
         content = message.text or message.caption
