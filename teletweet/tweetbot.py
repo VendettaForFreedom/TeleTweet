@@ -127,7 +127,7 @@ def generate_tags():
         f.close()
         return "".join(STRINGS)
 
-@bot.on_message(filters.chat([SOURCE_CHANNEL_ID]) & filters.text)
+@bot.on_message(filters.chat([SOURCE_CHANNEL_ID]) & filters.incoming)
 def auto_ad_message(message:types.Message):
     content = message.text or message.caption
     try:
