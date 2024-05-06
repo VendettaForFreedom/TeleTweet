@@ -161,6 +161,9 @@ def auto_ad_message(client, message:types.Message):
         else:
             return
         
+        if chat_id is None:
+            chat_id = ""
+            
         try:
             del Multi_message[SOURCE_CHANNEL_ID]
             bot.send_photo(
@@ -170,6 +173,19 @@ def auto_ad_message(client, message:types.Message):
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
                 CHANNEL + generate_tags() or SIGN, 
+                parse_mode=enums.ParseMode.MARKDOWN
+            )
+        except Exception as e:
+            logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
+        
+        try:
+            bot.send_photo(
+                GROUP_ID, 
+                picture,
+                truncate_content(content) + "\n\n" + 
+                CONTINUE_READING +
+                SOURCE_CHANNEL + f"{chat_id}" + "\n" +
+                "@mahsanet" + generate_tags() or SIGN, 
                 parse_mode=enums.ParseMode.MARKDOWN
             )
         except Exception as e:

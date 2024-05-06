@@ -19,7 +19,7 @@ ACCESS_KEY = os.getenv("ACCESS_KEY", "")
 ACCESS_SECRET = os.getenv("ACCESS_SECRET", "")
 CONFIG_CHANNEL_ID = os.getenv("CONFIG_CHANNEL_ID", "")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
-SOURCE_CHANNEL_ID = os.getenv("SOURCE_CHANNEL_ID", "-1002017080469")
+SOURCE_CHANNEL_ID = os.getenv("SOURCE_CHANNEL_ID", "")
 GROUP_ID = os.getenv("GROUP_ID", "")
 # AUTH_STRING = os.getenv("AUTH_STRING", "")
 
