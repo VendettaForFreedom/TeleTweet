@@ -185,7 +185,7 @@ def auto_ad_message(client, message:types.Message):
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
                 GROUP + generate_tags(),
-                reply_to_message_id = "1157"
+                reply_to_message_id = 1157
             )
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
