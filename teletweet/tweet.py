@@ -14,7 +14,7 @@ from typing import Union
 
 import tweepy
 
-from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET, TODAY_CONFIG, SIGN, LAST_MESSAGE, CHANNEL_URL
+from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET, TODAY_CONFIG, SIGN, CONFIG_CHANNEL, CHANNEL_URL
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(filename)s [%(levelname)s]: %(message)s")
 
@@ -53,7 +53,7 @@ def send_tweet(message, pics: Union[list, None] = None) -> dict:
     logging.info("Preparing tweet for...")
     chat_id = message.chat.id
     # text = message.text or message.caption
-    text = TODAY_CONFIG + LAST_MESSAGE + f"{message.id}"
+    text = TODAY_CONFIG + CONFIG_CHANNEL + f"{message.id}"
     channel_info = CHANNEL_URL + SIGN
     if not text:
         text = channel_info 
