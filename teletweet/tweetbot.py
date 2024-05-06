@@ -33,6 +33,7 @@ from config import (
     CONTINUE_READING,
     CHANNEL, 
     GROUP_ID, 
+    GROUP,
     tweet_format
 )
 
@@ -185,7 +186,7 @@ def auto_ad_message(client, message:types.Message):
                 truncate_content(content) + "\n\n" + 
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
-                "@mahsanet" + generate_tags() or SIGN, 
+                GROUP + generate_tags() or SIGN, 
                 parse_mode=enums.ParseMode.MARKDOWN
             )
         except Exception as e:
