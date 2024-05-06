@@ -27,7 +27,6 @@ from config import (
     ALLOW_USERS, 
     FEEDBACK, 
     TODAY_CONFIG, 
-    SIGN, 
     CONFIG_CHANNEL, 
     SOURCE_CHANNEL,
     CONTINUE_READING,
@@ -173,8 +172,7 @@ def auto_ad_message(client, message:types.Message):
                 truncate_content(content) + "\n\n" + 
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
-                CHANNEL + generate_tags() or SIGN, 
-                parse_mode=enums.ParseMode.MARKDOWN
+                CHANNEL + generate_tags()
             )
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
@@ -186,17 +184,17 @@ def auto_ad_message(client, message:types.Message):
                 truncate_content(content) + "\n\n" + 
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
-                GROUP + generate_tags() or SIGN, 
-                parse_mode=enums.ParseMode.MARKDOWN
+                GROUP + generate_tags(),
+                reply_to_message_id = "1157"
             )
         except Exception as e:
-            logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
+            logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
 
 def send_ad_message(message):
     try:
         messageNew = bot.send_message(
             CONFIG_CHANNEL_ID, 
-            TODAY_CONFIG + FEEDBACK + CHANNEL + generate_tags() or SIGN
+            TODAY_CONFIG + FEEDBACK + CHANNEL + generate_tags()
         )
     except:
         bot.send_message(
@@ -210,7 +208,7 @@ def send_ad_message(message):
         config_channel = CONFIG_CHANNEL + f"{messageNew.id}"
         bot.send_message(
             CHANNEL_ID, 
-            TODAY_CONFIG + config_channel + FEEDBACK + CHANNEL + generate_tags() or SIGN
+            TODAY_CONFIG + config_channel + FEEDBACK + CHANNEL + generate_tags()
         )
     except:
         bot.send_message(
@@ -223,7 +221,7 @@ def send_ad_message(message):
     try:
         bot.send_message(
             GROUP_ID, 
-            TODAY_CONFIG + CONFIG_CHANNEL + FEEDBACK + CHANNEL + generate_tags() or SIGN
+            TODAY_CONFIG + CONFIG_CHANNEL + FEEDBACK + CHANNEL + generate_tags()
         )
     except:
         bot.send_message(
@@ -242,11 +240,11 @@ def handle_message(message, send_ad=True):
         send_ad_message(message)
         for part in parts:
             if len(part) > 10:
-                bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + generate_tags() or SIGN)
+                bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + generate_tags())
                 time.sleep(1)
     else:
         try:
-            bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + generate_tags() or SIGN)
+            bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + generate_tags())
         except:
             bot.send_message(message.chat.id, "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID)
 
