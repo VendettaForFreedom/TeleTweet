@@ -14,7 +14,7 @@ from typing import Union
 
 import tweepy
 
-from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET, TODAY_CONFIG, SIGN, CONFIG_CHANNEL, CHANNEL_URL
+from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET, TODAY_CONFIG, CONFIG_CHANNEL, CHANNEL_URL
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(filename)s [%(levelname)s]: %(message)s")
 
