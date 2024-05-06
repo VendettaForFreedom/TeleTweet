@@ -19,7 +19,7 @@ ACCESS_KEY = os.getenv("ACCESS_KEY", "")
 ACCESS_SECRET = os.getenv("ACCESS_SECRET", "")
 CONFIG_CHANNEL_ID = os.getenv("CONFIG_CHANNEL_ID", "")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
-SOURCE_CHANNEL_ID = os.getenv("SOURCE_CHANNEL_ID", "-1002017080469")
+SOURCE_CHANNEL_ID = os.getenv("SOURCE_CHANNEL_ID", "")
 GROUP_ID = os.getenv("GROUP_ID", "")
 # AUTH_STRING = os.getenv("AUTH_STRING", "")
 
@@ -27,9 +27,10 @@ FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون 
 TODAY_CONFIG = "کانفیگ های امروز:"
 CHANNEL_URL = """\n\nhttps://t.me/FreeVPNHomes\n\n"""
 CHANNEL = """\n\n@FreeVPNHomes\n\n"""
-SIGN = """به امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
+# SIGN = """به امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
 CONFIG_CHANNEL = "\nhttps://t.me/FreeVPNHomesConfigs/"
 SOURCE_CHANNEL = "\nhttps://t.me/javeednaman/"
+GROUP = "\n\n@mahsa_net\n\n"
 CONTINUE_READING = "ادامه مطلب رو در کانال زیر بخوانید:\n"
 
 tweet_format = "https://twitter.com/{screen_name}/status/{id}"
