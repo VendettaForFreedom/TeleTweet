@@ -33,6 +33,7 @@ from config import (
     CHANNEL, 
     GROUP_ID, 
     GROUP,
+    GROUP_TOPIC_ID,
     tweet_format
 )
 
@@ -188,7 +189,7 @@ def auto_ad_message(client, message:types.Message):
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
                 GROUP + generate_tags(),
-                reply_to_message_id = 108526
+                reply_to_message_id = GROUP_TOPIC_ID
             )
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
