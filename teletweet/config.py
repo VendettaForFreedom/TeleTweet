@@ -29,7 +29,6 @@ FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون 
 TODAY_CONFIG = "کانفیگ های امروز:"
 CHANNEL_URL = """\n\nhttps://t.me/FreeVPNHomes\n\n"""
 CHANNEL = """\n\n@FreeVPNHomes\n\n"""
-# SIGN = """به امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
 CONFIG_CHANNEL = "\nhttps://t.me/FreeVPNHomesConfigs/"
 SOURCE_CHANNEL = "\nhttps://t.me/javeednaman/"
 CONTINUE_READING = "ادامه مطلب رو در کانال زیر بخوانید:\n"
