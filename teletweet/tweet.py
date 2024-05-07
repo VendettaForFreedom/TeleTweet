@@ -11,6 +11,7 @@ import logging
 import re
 import traceback
 from typing import Union
+from tweetbot import generate_tags
 
 import tweepy
 
@@ -47,16 +48,6 @@ def upload_media(api, pic) -> Union[list, None]:
         mid = api.media_upload(item.name, file=item)
         ids.append(mid)
     return [i.media_id for i in ids]
-
-def generate_tags():
-    with open("tags.txt", "r") as f:
-        strings = f.read().splitlines() 
-        import random
-
-        random.shuffle(strings)
-        STRINGS = strings[:3]
-        f.close()
-        return "\n".join(STRINGS)
 
 def send_tweet(message, pics: Union[list, None] = None) -> dict:
     logging.info("Preparing tweet for...")
