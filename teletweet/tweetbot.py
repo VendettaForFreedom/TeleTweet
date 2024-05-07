@@ -44,6 +44,7 @@ from tweet import (
     get_video_download_link,
     is_video_tweet,
     send_tweet,
+    generate_tags
 )
 
 lock = Lock()
@@ -119,16 +120,6 @@ def help_handler(client, message: types.Message):
 
     # info = get_runtime("botsrunner_teletweet_1")[:500]
     bot.send_message(message.chat.id, userinfo, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
-
-def generate_tags():
-    with open("tags.txt", "r") as f:
-        strings = f.read().splitlines() 
-        import random
-
-        random.shuffle(strings)
-        STRINGS = strings[:3]
-        f.close()
-        return "\n".join(STRINGS)
     
 def truncate_content(content):
     if len(content) > 500:

@@ -11,7 +11,7 @@ import logging
 import re
 import traceback
 from typing import Union
-from tweetbot import generate_tags
+from helper import generate_tags
 
 import tweepy
 
