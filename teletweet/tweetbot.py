@@ -33,6 +33,7 @@ from config import (
     CHANNEL, 
     GROUP_ID, 
     GROUP,
+    GROUP_TOPIC_ID,
     tweet_format
 )
 
@@ -130,14 +131,14 @@ def generate_tags():
         return "\n".join(STRINGS)
     
 def truncate_content(content):
-    if len(content) > 200:
-        return content[:200] + "..."
+    if len(content) > 500:
+        return content[:500] + "..."
     else:
         return content
 
 def is_multi_message(message):
     time_difference = message.date - Multi_message[SOURCE_CHANNEL_ID].date
-    return time_difference < timedelta(minutes=1)
+    return time_difference < timedelta(minutes=5)
 
 @bot.on_message(filters.incoming)
 def auto_ad_message(client, message:types.Message):
@@ -163,10 +164,11 @@ def auto_ad_message(client, message:types.Message):
         
         if chat_id is None:
             chat_id = ""
-            
+
+        messageNew = None   
         try:
             del Multi_message[SOURCE_CHANNEL_ID]
-            bot.send_photo(
+            messageNew = bot.send_photo(
                 CHANNEL_ID, 
                 picture,
                 truncate_content(content) + "\n\n" + 
@@ -177,6 +179,8 @@ def auto_ad_message(client, message:types.Message):
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
         
+        time.sleep(1)
+        
         try:
             bot.send_photo(
                 GROUP_ID, 
@@ -185,10 +189,13 @@ def auto_ad_message(client, message:types.Message):
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
                 GROUP + generate_tags(),
-                reply_to_message_id = 108526
+                reply_to_message_id = GROUP_TOPIC_ID
             )
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
+
+        # Todo: send tweet
+        # send_tweet(messageNew)
 
 def send_ad_message(message):
     try:
