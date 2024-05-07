@@ -31,7 +31,7 @@ CHANNEL = """\n\n@FreeVPNHomes\n\n"""
 # SIGN = """به امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
 CONFIG_CHANNEL = "\nhttps://t.me/FreeVPNHomesConfigs/"
 SOURCE_CHANNEL = "\nhttps://t.me/javeednaman/"
-GROUP = "\n\n@mahsa_net\n\n"
+GROUP = "" # \n\n@mahsa_net\n\n
 CONTINUE_READING = "ادامه مطلب رو در کانال زیر بخوانید:\n"
 
 tweet_format = "https://twitter.com/{screen_name}/status/{id}"
