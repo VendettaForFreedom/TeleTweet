@@ -187,9 +187,23 @@ def auto_ad_message(client, message:types.Message):
                 picture,
                 truncate_content(content) + "\n\n" + 
                 CONTINUE_READING +
-                SOURCE_CHANNEL + f"{chat_id}" + "\n" +
+                SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
                 GROUP + generate_tags(),
                 reply_to_message_id = GROUP_TOPIC_ID
+            )
+        except Exception as e:
+            logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
+        
+        time.sleep(1)
+        
+        try:
+            bot.send_photo(
+                GROUP_ID, 
+                picture,
+                truncate_content(content) + "\n\n" + 
+                CONTINUE_READING +
+                SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
+                GROUP + generate_tags()
             )
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
