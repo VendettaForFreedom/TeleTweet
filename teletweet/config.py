@@ -21,7 +21,8 @@ CONFIG_CHANNEL_ID = os.getenv("CONFIG_CHANNEL_ID", "")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
 SOURCE_CHANNEL_ID = os.getenv("SOURCE_CHANNEL_ID", "")
 GROUP_ID = os.getenv("GROUP_ID", "")
-GROUP_TOPIC_ID = os.getenv("GROUP_TOPIC_ID", "108526")
+GROUP_TOPIC_ID = os.getenv("GROUP_TOPIC_ID", "")
+GROUP = os.getenv("GROUP", "")
 # AUTH_STRING = os.getenv("AUTH_STRING", "")
 
 FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nتوییتر:\nhttps://twitter.com/FreeVPNHomes"
@@ -31,7 +32,6 @@ CHANNEL = """\n\n@FreeVPNHomes\n\n"""
 # SIGN = """به امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
 CONFIG_CHANNEL = "\nhttps://t.me/FreeVPNHomesConfigs/"
 SOURCE_CHANNEL = "\nhttps://t.me/javeednaman/"
-GROUP = "" # \n\n@mahsa_net\n\n
 CONTINUE_READING = "ادامه مطلب رو در کانال زیر بخوانید:\n"
 
 tweet_format = "https://twitter.com/{screen_name}/status/{id}"
