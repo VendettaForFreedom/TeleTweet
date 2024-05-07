@@ -11,13 +11,32 @@ import logging
 import os
 import tempfile
 import time
+from datetime import timedelta
 from threading import Lock
 
 import requests
 from pyrogram import Client, enums, filters, types
-from tgbot_ping import get_runtime
 
-from config import APP_HASH, APP_ID, BOT_TOKEN, CONFIG_CHANNEL_ID, CHANNEL_ID, ALLOW_USERS, FEEDBACK, TODAY_CONFIG, SIGN, LAST_MESSAGE, CHANNEL, GROUP_ID, tweet_format
+from config import (
+    APP_HASH, 
+    APP_ID, 
+    BOT_TOKEN, 
+    CONFIG_CHANNEL_ID, 
+    CHANNEL_ID, 
+    SOURCE_CHANNEL_ID,
+    ALLOW_USERS, 
+    FEEDBACK, 
+    TODAY_CONFIG, 
+    CONFIG_CHANNEL, 
+    SOURCE_CHANNEL,
+    CONTINUE_READING,
+    CHANNEL, 
+    GROUP_ID, 
+    GROUP,
+    GROUP_TOPIC_ID,
+    tweet_format
+)
+
 from helper import get_auth_data, sign_in, sign_off
 from tweet import (
     delete_tweet,
@@ -34,7 +53,7 @@ media_group = {}
 bot = Client("teletweet", APP_ID, APP_HASH, bot_token=BOT_TOKEN)
 
 STEP = {}
-
+Multi_message = {}
 
 @bot.on_message(filters.command(["start"]))
 def start_handler(client, message: types.Message):
@@ -74,7 +93,7 @@ def user_check(func):
         user_id = message.chat.id
         logging.info("User %s is using the bot", user_id)
         
-        if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID]:
+        if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID, SOURCE_CHANNEL_ID, GROUP_ID]:
             logging.info("User %s got into the first if", user_id)
             if str(user_id) in ALLOW_USERS:
                 logging.info("User %s got into the second if", user_id)
@@ -101,11 +120,102 @@ def help_handler(client, message: types.Message):
     # info = get_runtime("botsrunner_teletweet_1")[:500]
     bot.send_message(message.chat.id, userinfo, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
+def generate_tags():
+    with open("tags.txt", "r") as f:
+        strings = f.read().splitlines() 
+        import random
+
+        random.shuffle(strings)
+        STRINGS = strings[:3]
+        f.close()
+        return "\n".join(STRINGS)
+    
+def truncate_content(content):
+    if len(content) > 500:
+        return content[:500] + "..."
+    else:
+        return content
+
+def is_multi_message(message):
+    time_difference = message.date - Multi_message[SOURCE_CHANNEL_ID].date
+    return time_difference < timedelta(minutes=5)
+
+@bot.on_message(filters.incoming)
+def auto_ad_message(client, message:types.Message):
+    if str(message.chat.id) == SOURCE_CHANNEL_ID:
+        logging.info("Message received from %s", message.chat.id)
+        if not Multi_message or not is_multi_message(message):
+            Multi_message[SOURCE_CHANNEL_ID] = message
+            return
+        
+        content = ""
+        picture = ""
+        chat_id = ""
+        if (message.photo is not None and (Multi_message[SOURCE_CHANNEL_ID].text is not None or Multi_message[SOURCE_CHANNEL_ID].caption is not None)):
+            content = Multi_message[SOURCE_CHANNEL_ID].text or Multi_message[SOURCE_CHANNEL_ID].caption
+            picture = message.photo.file_id
+            chat_id = Multi_message[SOURCE_CHANNEL_ID].forward_from_message_id
+        elif (Multi_message[SOURCE_CHANNEL_ID].photo is not None and (message.text is not None or message.caption is not None)):
+            content = message.text or message.caption
+            picture = Multi_message[SOURCE_CHANNEL_ID].photo.file_id
+            chat_id = message.forward_from_message_id
+        else:
+            return
+        
+        if chat_id is None:
+            chat_id = ""
+
+        messageNew = None   
+        try:
+            del Multi_message[SOURCE_CHANNEL_ID]
+            messageNew = bot.send_photo(
+                CHANNEL_ID, 
+                picture,
+                truncate_content(content) + "\n\n" + 
+                CONTINUE_READING +
+                SOURCE_CHANNEL + f"{chat_id}" + "\n" +
+                CHANNEL + generate_tags()
+            )
+        except Exception as e:
+            logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
+        
+        time.sleep(1)
+        
+        try:
+            bot.send_photo(
+                GROUP_ID, 
+                picture,
+                truncate_content(content) + "\n\n" + 
+                CONTINUE_READING +
+                SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
+                GROUP + generate_tags(),
+                reply_to_message_id = GROUP_TOPIC_ID
+            )
+        except Exception as e:
+            logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
+        
+        time.sleep(1)
+        
+        try:
+            bot.send_photo(
+                GROUP_ID, 
+                picture,
+                truncate_content(content) + "\n\n" + 
+                CONTINUE_READING +
+                SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
+                GROUP + generate_tags()
+            )
+        except Exception as e:
+            logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
+
+        # Todo: send tweet
+        # send_tweet(messageNew)
+
 def send_ad_message(message):
     try:
         messageNew = bot.send_message(
             CONFIG_CHANNEL_ID, 
-            TODAY_CONFIG + FEEDBACK + CHANNEL + SIGN
+            TODAY_CONFIG + FEEDBACK + CHANNEL + generate_tags()
         )
     except:
         bot.send_message(
@@ -116,10 +226,10 @@ def send_ad_message(message):
     time.sleep(1)
 
     try:
-        last_message = LAST_MESSAGE + f"{messageNew.id}"
+        config_channel = CONFIG_CHANNEL + f"{messageNew.id}"
         bot.send_message(
             CHANNEL_ID, 
-            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
+            TODAY_CONFIG + config_channel + FEEDBACK + CHANNEL + generate_tags()
         )
     except:
         bot.send_message(
@@ -132,7 +242,7 @@ def send_ad_message(message):
     try:
         bot.send_message(
             GROUP_ID, 
-            TODAY_CONFIG + last_message + FEEDBACK + CHANNEL + SIGN
+            TODAY_CONFIG + CONFIG_CHANNEL + FEEDBACK + CHANNEL + generate_tags()
         )
     except:
         bot.send_message(
@@ -151,11 +261,11 @@ def handle_message(message, send_ad=True):
         send_ad_message(message)
         for part in parts:
             if len(part) > 10:
-                bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + SIGN)
+                bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + generate_tags())
                 time.sleep(1)
     else:
         try:
-            bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + SIGN)
+            bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + generate_tags())
         except:
             bot.send_message(message.chat.id, "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID)
 

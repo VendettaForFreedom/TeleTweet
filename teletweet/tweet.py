@@ -14,7 +14,7 @@ from typing import Union
 
 import tweepy
 
-from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET, TODAY_CONFIG, SIGN, LAST_MESSAGE, CHANNEL_URL
+from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET, TODAY_CONFIG, CONFIG_CHANNEL, CHANNEL_URL
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(filename)s [%(levelname)s]: %(message)s")
 
@@ -48,13 +48,22 @@ def upload_media(api, pic) -> Union[list, None]:
         ids.append(mid)
     return [i.media_id for i in ids]
 
+def generate_tags():
+    with open("tags.txt", "r") as f:
+        strings = f.read().splitlines() 
+        import random
+
+        random.shuffle(strings)
+        STRINGS = strings[:3]
+        f.close()
+        return "\n".join(STRINGS)
 
 def send_tweet(message, pics: Union[list, None] = None) -> dict:
     logging.info("Preparing tweet for...")
     chat_id = message.chat.id
     # text = message.text or message.caption
-    text = TODAY_CONFIG + LAST_MESSAGE + f"{message.id}"
-    channel_info = CHANNEL_URL + SIGN
+    text = TODAY_CONFIG + CONFIG_CHANNEL + f"{message.id}"
+    channel_info = CHANNEL_URL + generate_tags()
     if not text:
         text = channel_info 
     if len(text) + len(channel_info) > 280:
