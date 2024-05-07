@@ -120,6 +120,20 @@ def help_handler(client, message: types.Message):
 
     # info = get_runtime("botsrunner_teletweet_1")[:500]
     bot.send_message(message.chat.id, userinfo, parse_mode=enums.ParseMode.MARKDOWN, disable_web_page_preview=True)
+
+@bot.on_message(filters.command(["single_config"]))
+@user_check
+def config_handler(client, message: types.Message):
+    message.reply_chat_action(enums.ChatAction.TYPING)
+    bot.send_message(message.chat.id, "Send me a single config I send it without any ad.")
+    STEP[message.chat.id] = "single_config"
+
+@bot.on_message(filters.command(["multiple_configs"]))
+@user_check
+def config_handler(client, message: types.Message):
+    message.reply_chat_action(enums.ChatAction.TYPING)
+    bot.send_message(message.chat.id, "Send me a list of configs I send them with an ad.")
+    STEP[message.chat.id] = "multiple_configs"
     
 def truncate_content(content):
     if len(content) > 500:
@@ -259,23 +273,7 @@ def handle_message(message, send_ad=True):
             bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + generate_tags())
         except:
             bot.send_message(message.chat.id, "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID)
-
-
-@bot.on_message(filters.command(["single_config"]))
-@user_check
-def config_handler(client, message: types.Message):
-    message.reply_chat_action(enums.ChatAction.TYPING)
-    bot.send_message(message.chat.id, "Send me a single config I send it without any ad.")
-    STEP[message.chat.id] = "single_config"
-
-@bot.on_message(filters.command(["multiple_configs"]))
-@user_check
-def config_handler(client, message: types.Message):
-    message.reply_chat_action(enums.ChatAction.TYPING)
-    bot.send_message(message.chat.id, "Send me a list of configs I send them with an ad.")
-    STEP[message.chat.id] = "multiple_configs"
     
-
 @bot.on_message(filters.incoming & filters.text)
 @user_check
 def tweet_text_handler(client, message: types.Message):
