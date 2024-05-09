@@ -50,7 +50,12 @@ def generate_tags():
         strings = f.read().splitlines() 
         import random
 
+        STRINGS = strings[:5]
+        random.shuffle(STRINGS)
+        STRINGS = STRINGS[:1]
+
+
         random.shuffle(strings)
-        STRINGS = strings[:3]
+        STRINGS.extend(strings[:2])
         f.close()
         return "\n".join(STRINGS)
