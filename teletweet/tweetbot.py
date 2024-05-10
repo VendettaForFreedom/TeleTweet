@@ -243,8 +243,9 @@ def auto_ad_message(message:types.Message):
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
 
-        # Todo: send tweet
-        # send_tweet(messageNew)
+        img_data = messageNew.download(in_memory=True)
+        setattr(img_data, "mode", "rb")
+        send_tweet(messageNew, [img_data])
 
 def send_ad_message(message):
     try:
@@ -261,7 +262,7 @@ def send_ad_message(message):
     time.sleep(1)
 
     try:
-        config_channel = CONFIG_CHANNEL + f"{messageNew.id}"
+        messageNew = config_channel = CONFIG_CHANNEL + f"{messageNew.id}"
         bot.send_message(
             CHANNEL_ID, 
             TODAY_CONFIG + config_channel + FEEDBACK + CHANNEL + generate_tags()
