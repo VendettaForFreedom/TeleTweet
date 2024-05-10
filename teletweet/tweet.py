@@ -15,7 +15,18 @@ from helper import generate_tags
 
 import tweepy
 
-from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET, TODAY_CONFIG, CONFIG_CHANNEL, CHANNEL_URL, CHANNEL
+from config import (
+    CONSUMER_KEY, 
+    CONSUMER_SECRET,
+    ACCESS_KEY, 
+    ACCESS_SECRET, 
+    TODAY_CONFIG, 
+    CONFIG_CHANNEL, 
+    CHANNEL_URL, 
+    CHANNEL,
+    DISCUSSION_GROUP,
+    DISCUSSION_GROUP_URL
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(filename)s [%(levelname)s]: %(message)s")
 
@@ -54,7 +65,7 @@ def send_tweet(message, pics: Union[list, None] = None) -> dict:
     chat_id = message.chat.id
 
     text = message.text or message.caption
-    text = text.replace(CHANNEL, CHANNEL_URL)
+    text = text.replace(CHANNEL, CHANNEL_URL).replace(DISCUSSION_GROUP, DISCUSSION_GROUP_URL)
 
     tweet_id = __get_tweet_id_from_reply(message)
     client, api = __connect_twitter(chat_id)
