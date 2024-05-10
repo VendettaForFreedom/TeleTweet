@@ -54,7 +54,7 @@ def send_tweet(message, pics: Union[list, None] = None) -> dict:
     chat_id = message.chat.id
 
     text = message.text or message.caption
-    text.replace(CHANNEL, CHANNEL_URL)
+    text = text.replace(CHANNEL, CHANNEL_URL)
 
     tweet_id = __get_tweet_id_from_reply(message)
     client, api = __connect_twitter(chat_id)
