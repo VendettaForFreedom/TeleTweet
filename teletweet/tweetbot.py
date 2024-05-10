@@ -96,7 +96,7 @@ def user_check(func):
         
         if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID, GROUP_ID]:
             logging.info("User %s got into the first if", user_id)
-            if str(user_id) in [ALLOW_USERS, SOURCE_CHANNEL_ID]:
+            if str(user_id) in [ALLOW_USERS] or str(user_id) in [SOURCE_CHANNEL_ID]:
                 logging.info("User %s got into the second if", user_id)
                 logging.info("User %s is authenticated!")
                 return func(client, message)
