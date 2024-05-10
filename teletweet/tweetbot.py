@@ -34,7 +34,6 @@ from config import (
     GROUP_ID, 
     GROUP,
     GROUP_TOPIC_ID,
-    TWITTER,
     tweet_format
 )
 
@@ -252,7 +251,7 @@ def send_ad_message(message):
     try:
         messageNew = bot.send_message(
             CONFIG_CHANNEL_ID, 
-            TODAY_CONFIG + FEEDBACK + TWITTER + CHANNEL + generate_tags()
+            TODAY_CONFIG + FEEDBACK + CHANNEL + generate_tags()
         )
     except:
         bot.send_message(
@@ -266,7 +265,7 @@ def send_ad_message(message):
         config_channel = CONFIG_CHANNEL + f"{messageNew.id}"
         messageNew = bot.send_message(
             CHANNEL_ID, 
-            TODAY_CONFIG + config_channel + FEEDBACK + TWITTER + CHANNEL + generate_tags()
+            TODAY_CONFIG + config_channel + FEEDBACK + CHANNEL + generate_tags()
         )
     except:
         bot.send_message(
@@ -279,7 +278,7 @@ def send_ad_message(message):
     try:
         bot.send_message(
             GROUP_ID, 
-            TODAY_CONFIG + CONFIG_CHANNEL + FEEDBACK + TWITTER + CHANNEL + generate_tags()
+            TODAY_CONFIG + CONFIG_CHANNEL + FEEDBACK + CHANNEL + generate_tags()
         )
     except:
         bot.send_message(
