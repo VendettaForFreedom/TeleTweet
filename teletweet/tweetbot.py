@@ -134,6 +134,32 @@ def config_handler(client, message: types.Message):
     message.reply_chat_action(enums.ChatAction.TYPING)
     bot.send_message(message.chat.id, "Send me a list of configs I send them with an ad.")
     STEP[message.chat.id] = "multiple_configs"
+
+@bot.on_message(filters.incoming & filters.text)
+@user_check
+def tweet_text_handler(client, message: types.Message):
+    message.reply_chat_action(enums.ChatAction.TYPING)
+    # first check if the user want to download video, gif
+    tweet_id = is_video_tweet(message.chat.id, message.text)
+    if tweet_id and message.text.startswith("https://twitter.com"):
+        btn1 = types.InlineKeyboardButton("Download", callback_data=tweet_id)
+        btn2 = types.InlineKeyboardButton("Tweet", callback_data="tweet")
+        markup = types.InlineKeyboardMarkup(
+            [
+                [btn1, btn2],
+            ]
+        )
+        message.reply_text("Do you want to download video or just tweet this?", quote=True, reply_markup=markup)
+        return
+    
+    if STEP.get(message.chat.id) == "single_config":
+        handle_message(message, False)
+        STEP.pop(message.chat.id)
+    elif STEP.get(message.chat.id) == "multiple_configs":
+        handle_message(message)
+        STEP.pop(message.chat.id)
+    else:
+        bot.send_message(message.chat.id, "Send me a command first.")
     
 def truncate_content(content):
     if len(content) > 500:
@@ -273,32 +299,6 @@ def handle_message(message, send_ad=True):
             bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + generate_tags())
         except:
             bot.send_message(message.chat.id, "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID)
-    
-@bot.on_message(filters.incoming & filters.text)
-@user_check
-def tweet_text_handler(client, message: types.Message):
-    message.reply_chat_action(enums.ChatAction.TYPING)
-    # first check if the user want to download video, gif
-    tweet_id = is_video_tweet(message.chat.id, message.text)
-    if tweet_id and message.text.startswith("https://twitter.com"):
-        btn1 = types.InlineKeyboardButton("Download", callback_data=tweet_id)
-        btn2 = types.InlineKeyboardButton("Tweet", callback_data="tweet")
-        markup = types.InlineKeyboardMarkup(
-            [
-                [btn1, btn2],
-            ]
-        )
-        message.reply_text("Do you want to download video or just tweet this?", quote=True, reply_markup=markup)
-        return
-    
-    if STEP.get(message.chat.id) == "single_config":
-        handle_message(message, False)
-        STEP.pop(message.chat.id)
-    elif STEP.get(message.chat.id) == "multiple_configs":
-        handle_message(message)
-        STEP.pop(message.chat.id)
-    else:
-        bot.send_message(message.chat.id, "Send me a command first.")
 
 @bot.on_message(filters.media_group)
 @user_check
