@@ -209,7 +209,7 @@ def auto_ad_message(message:types.Message):
                 truncate_content(content) + "\n\n" + 
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
-                CHANNEL + generate_tags()
+                CHANNEL + generate_tags("first5random")
             )
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
@@ -223,7 +223,7 @@ def auto_ad_message(message:types.Message):
                 truncate_content(content) + "\n\n" + 
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
-                GROUP + generate_tags(),
+                GROUP + generate_tags("first5random"),
                 reply_to_message_id = GROUP_TOPIC_ID
             )
         except Exception as e:
