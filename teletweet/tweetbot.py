@@ -94,13 +94,12 @@ def user_check(func):
         user_id = message.chat.id
         logging.info("User %s is using the bot", user_id)
         
-        if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID, SOURCE_CHANNEL_ID, GROUP_ID]:
+        if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID, GROUP_ID]:
             logging.info("User %s got into the first if", user_id)
-            if str(user_id) in ALLOW_USERS:
+            if str(user_id) in [ALLOW_USERS, SOURCE_CHANNEL_ID]:
                 logging.info("User %s got into the second if", user_id)
                 logging.info("User %s is authenticated!")
                 return func(client, message)
-            
             else:
                 logging.info("User %s got into the else", user_id)
                 logging.info("User %s is not authenticated!")
@@ -135,10 +134,16 @@ def config_handler(client, message: types.Message):
     bot.send_message(message.chat.id, "Send me a list of configs I send them with an ad.")
     STEP[message.chat.id] = "multiple_configs"
 
-@bot.on_message(filters.incoming & filters.text)
+@bot.on_message(filters.incoming)
 @user_check
 def tweet_text_handler(client, message: types.Message):
-    message.reply_chat_action(enums.ChatAction.TYPING)
+    if str(message.chat.id) == SOURCE_CHANNEL_ID:
+        auto_ad_message(message)
+        return
+    if(message.text is None and message.caption is None):
+        return
+    
+    message.reply_chat_action(enums.ChatAction.TYPING)  
     # first check if the user want to download video, gif
     tweet_id = is_video_tweet(message.chat.id, message.text)
     if tweet_id and message.text.startswith("https://twitter.com"):
@@ -171,8 +176,7 @@ def is_multi_message(message):
     time_difference = message.date - Multi_message[SOURCE_CHANNEL_ID].date
     return time_difference < timedelta(minutes=5)
 
-@bot.on_message(filters.incoming)
-def auto_ad_message(client, message:types.Message):
+def auto_ad_message(message:types.Message):
     if str(message.chat.id) == SOURCE_CHANNEL_ID:
         logging.info("Message received from %s", message.chat.id)
         if not Multi_message or not is_multi_message(message):
