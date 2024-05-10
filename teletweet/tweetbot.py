@@ -262,8 +262,8 @@ def send_ad_message(message):
     time.sleep(1)
 
     try:
-        messageNew = config_channel = CONFIG_CHANNEL + f"{messageNew.id}"
-        bot.send_message(
+        config_channel = CONFIG_CHANNEL + f"{messageNew.id}"
+        messageNew = bot.send_message(
             CHANNEL_ID, 
             TODAY_CONFIG + config_channel + FEEDBACK + CHANNEL + generate_tags()
         )
