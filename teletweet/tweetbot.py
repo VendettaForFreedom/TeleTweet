@@ -34,6 +34,7 @@ from config import (
     GROUP_ID, 
     GROUP,
     GROUP_TOPIC_ID,
+    CHANNEL_URL,
     tweet_format
 )
 
@@ -248,8 +249,8 @@ def auto_ad_message(message:types.Message):
         send_tweet(messageNew,
             text=truncate_content(content,200) + "\n\n" + 
                 CONTINUE_READING +
-                SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
-                GROUP + generate_tags("first5random"),
+                SOURCE_CHANNEL + f"{chat_id}" + "\n" +
+                CHANNEL_URL + generate_tags("first5random")
             pics=[img_data])
 
 def send_ad_message(message):
