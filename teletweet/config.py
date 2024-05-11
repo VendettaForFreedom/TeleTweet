@@ -25,11 +25,13 @@ GROUP_TOPIC_ID = int(os.getenv("GROUP_TOPIC_ID", ""))
 GROUP = os.getenv("GROUP", "")
 # AUTH_STRING = os.getenv("AUTH_STRING", "")
 
-FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:\n@FreeVPNHomesDiscussion\n\nتوییتر:\nhttps://twitter.com/FreeVPNHomes"
+DISCUSSION_GROUP = "\n\n@FreeVPNHomesDiscussion\n\n"
+DISCUSSION_GROUP_URL = """\n\nhttps://t.me/FreeVPNHomesDiscussion\n\n"""
+TWITTER = "توییتر:\n\nhttps://twitter.com/FreeVPNHomes"
+FEEDBACK = "\n\nنظرات و پیشنهادات خودتون رو برامون تو گروه بنویسین:{0}".replace("{0}",DISCUSSION_GROUP) + TWITTER
 TODAY_CONFIG = "کانفیگ های امروز:"
 CHANNEL_URL = """\n\nhttps://t.me/FreeVPNHomes\n\n"""
 CHANNEL = """\n\n@FreeVPNHomes\n\n"""
-# SIGN = """به امید آزادی #توماج_صالحی\n#مهسا_امینی\n#آرمیتا_گراوند"""
 CONFIG_CHANNEL = "\nhttps://t.me/FreeVPNHomesConfigs/"
 SOURCE_CHANNEL = "\nhttps://t.me/javeednaman/"
 CONTINUE_READING = "ادامه مطلب رو در کانال زیر بخوانید:\n"
