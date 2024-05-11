@@ -247,11 +247,11 @@ def auto_ad_message(message:types.Message):
         img_data = messageNew.download(in_memory=True)
         setattr(img_data, "mode", "rb")
         send_tweet(messageNew,
-            text=truncate_content(content,200) + "\n\n" + 
-                CONTINUE_READING +
-                SOURCE_CHANNEL + f"{chat_id}" + "\n" +
-                CHANNEL_URL + generate_tags("first5random")
-            pics=[img_data])
+            truncate_content(content,200) + "\n\n" + 
+            CONTINUE_READING +
+            SOURCE_CHANNEL + f"{chat_id}" + "\n" +
+            CHANNEL_URL + generate_tags("first5random"),
+            [img_data])
 
 def send_ad_message(message):
     try:
