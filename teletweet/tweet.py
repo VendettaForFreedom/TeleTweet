@@ -15,7 +15,17 @@ from helper import generate_tags
 
 import tweepy
 
-from config import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET, TODAY_CONFIG, CONFIG_CHANNEL, CHANNEL_URL
+from config import (
+    CONSUMER_KEY, 
+    CONSUMER_SECRET,
+    ACCESS_KEY, 
+    ACCESS_SECRET, 
+    CHANNEL_URL, 
+    CHANNEL,
+    DISCUSSION_GROUP,
+    DISCUSSION_GROUP_URL,
+    TWITTER
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(filename)s [%(levelname)s]: %(message)s")
 
@@ -49,18 +59,13 @@ def upload_media(api, pic) -> Union[list, None]:
         ids.append(mid)
     return [i.media_id for i in ids]
 
-def send_tweet(message, pics: Union[list, None] = None) -> dict:
+def send_tweet(message, text, pics: Union[list, None] = None) -> dict:
     logging.info("Preparing tweet for...")
     chat_id = message.chat.id
-    # text = message.text or message.caption
-    text = TODAY_CONFIG + CONFIG_CHANNEL + f"{message.id}"
-    channel_info = CHANNEL_URL + generate_tags()
     if not text:
-        text = channel_info 
-    if len(text) + len(channel_info) > 280:
-        text = channel_info
-    else:
-        text = text + channel_info
+        text = message.text or message.caption
+        text = text.replace(CHANNEL, CHANNEL_URL).replace(DISCUSSION_GROUP, DISCUSSION_GROUP_URL).replace(TWITTER, "")
+
     tweet_id = __get_tweet_id_from_reply(message)
     client, api = __connect_twitter(chat_id)
     logging.info("Tweeting...")
@@ -73,7 +78,7 @@ def send_tweet(message, pics: Union[list, None] = None) -> dict:
         if "Your Tweet text is too long." in str(e):
             logging.warning("Tweet too long, trying to make it shorter...")
             # try to post by making it shorter
-            status = client.create_tweet(text=text[:110] + "...", media_ids=ids, in_reply_to_tweet_id=tweet_id)
+            status = client.create_tweet(text=text[:270] + "...", media_ids=ids, in_reply_to_tweet_id=tweet_id)
             response = status.data
         else:
             logging.error(traceback.format_exc())

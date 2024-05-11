@@ -34,6 +34,7 @@ from config import (
     GROUP_ID, 
     GROUP,
     GROUP_TOPIC_ID,
+    CHANNEL_URL,
     tweet_format
 )
 
@@ -94,13 +95,12 @@ def user_check(func):
         user_id = message.chat.id
         logging.info("User %s is using the bot", user_id)
         
-        if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID, SOURCE_CHANNEL_ID, GROUP_ID]:
+        if str(user_id) not in [CONFIG_CHANNEL_ID, CHANNEL_ID, GROUP_ID]:
             logging.info("User %s got into the first if", user_id)
-            if str(user_id) in ALLOW_USERS:
+            if str(user_id) in ALLOW_USERS or str(user_id) == SOURCE_CHANNEL_ID:
                 logging.info("User %s got into the second if", user_id)
                 logging.info("User %s is authenticated!")
                 return func(client, message)
-            
             else:
                 logging.info("User %s got into the else", user_id)
                 logging.info("User %s is not authenticated!")
@@ -134,10 +134,42 @@ def config_handler(client, message: types.Message):
     message.reply_chat_action(enums.ChatAction.TYPING)
     bot.send_message(message.chat.id, "Send me a list of configs I send them with an ad.")
     STEP[message.chat.id] = "multiple_configs"
+
+@bot.on_message(filters.incoming)
+@user_check
+def tweet_text_handler(client, message: types.Message):
+    if str(message.chat.id) == SOURCE_CHANNEL_ID:
+        auto_ad_message(message)
+        return
+    if(message.text is None and message.caption is None):
+        return
     
-def truncate_content(content):
-    if len(content) > 500:
-        return content[:500] + "..."
+    message.reply_chat_action(enums.ChatAction.TYPING)  
+    # first check if the user want to download video, gif
+    tweet_id = is_video_tweet(message.chat.id, message.text)
+    if tweet_id and message.text.startswith("https://twitter.com"):
+        btn1 = types.InlineKeyboardButton("Download", callback_data=tweet_id)
+        btn2 = types.InlineKeyboardButton("Tweet", callback_data="tweet")
+        markup = types.InlineKeyboardMarkup(
+            [
+                [btn1, btn2],
+            ]
+        )
+        message.reply_text("Do you want to download video or just tweet this?", quote=True, reply_markup=markup)
+        return
+    
+    if STEP.get(message.chat.id) == "single_config":
+        handle_message(message, False)
+        STEP.pop(message.chat.id)
+    elif STEP.get(message.chat.id) == "multiple_configs":
+        handle_message(message)
+        STEP.pop(message.chat.id)
+    else:
+        bot.send_message(message.chat.id, "Send me a command first.")
+    
+def truncate_content(content, limit=500):
+    if len(content) > limit:
+        return content[:limit] + "..."
     else:
         return content
 
@@ -145,8 +177,7 @@ def is_multi_message(message):
     time_difference = message.date - Multi_message[SOURCE_CHANNEL_ID].date
     return time_difference < timedelta(minutes=5)
 
-@bot.on_message(filters.incoming)
-def auto_ad_message(client, message:types.Message):
+def auto_ad_message(message:types.Message):
     if str(message.chat.id) == SOURCE_CHANNEL_ID:
         logging.info("Message received from %s", message.chat.id)
         if not Multi_message or not is_multi_message(message):
@@ -170,7 +201,8 @@ def auto_ad_message(client, message:types.Message):
         if chat_id is None:
             chat_id = ""
 
-        messageNew = None   
+        messageNew = None  
+        img_data = None 
         try:
             del Multi_message[SOURCE_CHANNEL_ID]
             messageNew = bot.send_photo(
@@ -179,8 +211,10 @@ def auto_ad_message(client, message:types.Message):
                 truncate_content(content) + "\n\n" + 
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
-                CHANNEL + generate_tags()
+                CHANNEL + generate_tags("first5random")
             )
+            img_data = messageNew.download(in_memory=True)
+            setattr(img_data, "mode", "rb")
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
         
@@ -193,7 +227,7 @@ def auto_ad_message(client, message:types.Message):
                 truncate_content(content) + "\n\n" + 
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
-                GROUP + generate_tags(),
+                GROUP + generate_tags("first5random"),
                 reply_to_message_id = GROUP_TOPIC_ID
             )
         except Exception as e:
@@ -208,13 +242,17 @@ def auto_ad_message(client, message:types.Message):
                 truncate_content(content) + "\n\n" + 
                 CONTINUE_READING +
                 SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
-                GROUP + generate_tags()
+                GROUP + generate_tags("first5random")
             )
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
 
-        # Todo: send tweet
-        # send_tweet(messageNew)
+        send_tweet(messageNew,
+            truncate_content(content, 100) + "\n" + 
+            CONTINUE_READING +
+            SOURCE_CHANNEL + f"{chat_id}" + "\n" +
+            CHANNEL_URL + generate_tags(),
+            [img_data])
 
 def send_ad_message(message):
     try:
@@ -232,7 +270,7 @@ def send_ad_message(message):
 
     try:
         config_channel = CONFIG_CHANNEL + f"{messageNew.id}"
-        bot.send_message(
+        messageNew = bot.send_message(
             CHANNEL_ID, 
             TODAY_CONFIG + config_channel + FEEDBACK + CHANNEL + generate_tags()
         )
@@ -273,32 +311,6 @@ def handle_message(message, send_ad=True):
             bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + generate_tags())
         except:
             bot.send_message(message.chat.id, "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID)
-    
-@bot.on_message(filters.incoming & filters.text)
-@user_check
-def tweet_text_handler(client, message: types.Message):
-    message.reply_chat_action(enums.ChatAction.TYPING)
-    # first check if the user want to download video, gif
-    tweet_id = is_video_tweet(message.chat.id, message.text)
-    if tweet_id and message.text.startswith("https://twitter.com"):
-        btn1 = types.InlineKeyboardButton("Download", callback_data=tweet_id)
-        btn2 = types.InlineKeyboardButton("Tweet", callback_data="tweet")
-        markup = types.InlineKeyboardMarkup(
-            [
-                [btn1, btn2],
-            ]
-        )
-        message.reply_text("Do you want to download video or just tweet this?", quote=True, reply_markup=markup)
-        return
-    
-    if STEP.get(message.chat.id) == "single_config":
-        handle_message(message, False)
-        STEP.pop(message.chat.id)
-    elif STEP.get(message.chat.id) == "multiple_configs":
-        handle_message(message)
-        STEP.pop(message.chat.id)
-    else:
-        bot.send_message(message.chat.id, "Send me a command first.")
 
 @bot.on_message(filters.media_group)
 @user_check
@@ -321,7 +333,7 @@ def tweet_group_photo_handler(client, message: types.Message):
             setattr(message, "text", caption)
         files.append(img_data)
     # handle_message(message)
-    result = send_tweet(message, files)
+    result = send_tweet(message, pics=files)
     notify_result(result, message)
     STEP.pop(media_group_id)
 
@@ -334,7 +346,7 @@ def tweet_single_photo_handler(client, message: types.Message):
     img_data = message.download(in_memory=True)
     setattr(img_data, "mode", "rb")
     # handle_message(message)
-    result = send_tweet(message, [img_data])
+    result = send_tweet(message, pics=[img_data])
     notify_result(result, message)
 
 

@@ -45,12 +45,19 @@ def sign_off(chat_id: str):
     # json.dump(data, open(abs_file_path, "w"))
     json.dump(data, open("auth.json", "w"))
 
-def generate_tags():
+def generate_tags(mode: str = "allrandom"):
     with open("tags.txt", "r") as f:
         strings = f.read().splitlines() 
         import random
 
-        random.shuffle(strings)
-        STRINGS = strings[:3]
+        STRINGS = strings[:5]
+        random.shuffle(STRINGS)
+        if(mode == "allrandom"):
+            STRINGS = STRINGS[:1]
+            random.shuffle(strings)
+            STRINGS.extend(strings[:2])
+        else:
+            STRINGS = STRINGS[:3]
+
         f.close()
         return "\n".join(STRINGS)
