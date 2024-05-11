@@ -166,9 +166,9 @@ def tweet_text_handler(client, message: types.Message):
     else:
         bot.send_message(message.chat.id, "Send me a command first.")
     
-def truncate_content(content):
-    if len(content) > 500:
-        return content[:500] + "..."
+def truncate_content(content, limit=500):
+    if len(content) > limit:
+        return content[:limit] + "..."
     else:
         return content
 
@@ -245,7 +245,12 @@ def auto_ad_message(message:types.Message):
 
         img_data = messageNew.download(in_memory=True)
         setattr(img_data, "mode", "rb")
-        send_tweet(messageNew, [img_data])
+        send_tweet(messageNew,
+            text=truncate_content(content,200) + "\n\n" + 
+                CONTINUE_READING +
+                SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
+                GROUP + generate_tags("first5random"),
+            pics=[img_data])
 
 def send_ad_message(message):
     try:
@@ -326,7 +331,7 @@ def tweet_group_photo_handler(client, message: types.Message):
             setattr(message, "text", caption)
         files.append(img_data)
     # handle_message(message)
-    result = send_tweet(message, files)
+    result = send_tweet(message, pics=files)
     notify_result(result, message)
     STEP.pop(media_group_id)
 
@@ -339,7 +344,7 @@ def tweet_single_photo_handler(client, message: types.Message):
     img_data = message.download(in_memory=True)
     setattr(img_data, "mode", "rb")
     # handle_message(message)
-    result = send_tweet(message, [img_data])
+    result = send_tweet(message, pics=[img_data])
     notify_result(result, message)
 
 
