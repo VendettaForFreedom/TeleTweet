@@ -248,10 +248,10 @@ def auto_ad_message(message:types.Message):
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
 
         send_tweet(messageNew,
-            truncate_content(content, 100) + "\n\n" + 
+            truncate_content(content, 100) + "\n" + 
             CONTINUE_READING +
             SOURCE_CHANNEL + f"{chat_id}" + "\n" +
-            CHANNEL_URL + generate_tags("first5random"),
+            CHANNEL_URL + generate_tags(),
             [img_data])
 
 def send_ad_message(message):
