@@ -201,7 +201,8 @@ def auto_ad_message(message:types.Message):
         if chat_id is None:
             chat_id = ""
 
-        messageNew = None   
+        messageNew = None  
+        img_data = None 
         try:
             del Multi_message[SOURCE_CHANNEL_ID]
             messageNew = bot.send_photo(
@@ -212,6 +213,8 @@ def auto_ad_message(message:types.Message):
                 SOURCE_CHANNEL + f"{chat_id}" + "\n" +
                 CHANNEL + generate_tags("first5random")
             )
+            img_data = messageNew.download(in_memory=True)
+            setattr(img_data, "mode", "rb")
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {CHANNEL_ID}: {e}")
         
@@ -244,10 +247,8 @@ def auto_ad_message(message:types.Message):
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
 
-        img_data = messageNew.download(in_memory=True)
-        setattr(img_data, "mode", "rb")
         send_tweet(messageNew,
-            truncate_content(content, 160) + "\n\n" + 
+            truncate_content(content, 100) + "\n\n" + 
             CONTINUE_READING +
             SOURCE_CHANNEL + f"{chat_id}" + "\n" +
             CHANNEL_URL + generate_tags("first5random"),
