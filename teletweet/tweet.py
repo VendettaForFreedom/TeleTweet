@@ -59,7 +59,7 @@ def upload_media(api, pic) -> Union[list, None]:
         ids.append(mid)
     return [i.media_id for i in ids]
 
-def send_tweet(message, text, pics: Union[list, None] = None) -> dict:
+def send_tweet(message, text = None, pics: Union[list, None] = None) -> dict:
     logging.info("Preparing tweet for...")
     chat_id = message.chat.id
     if not text:

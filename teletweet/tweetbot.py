@@ -299,8 +299,9 @@ def send_ad_message(message):
 
 def send_config_message(part):
     try:
-        fetched_messages = bot.get_messages("-1001895084823",[1299,1300])
-        content, picture, chat_id, img_data
+        logging.info("fetched_messages before")
+        fetched_messages = bot.get_messages(SOURCE_CHANNEL_ID,[475,474])
+        content, picture, chat_id, img_data = "", "", "", None
         for msg in fetched_messages:
             if msg.text is not None or msg.caption is not None:
                 content = msg.text or msg.caption
@@ -316,7 +317,7 @@ def send_config_message(part):
         bot.send_photo(
             CONFIG_CHANNEL_ID, 
             picture,
-            truncate_content(content) + "\n\n" + 
+            truncate_content(content,300) + "\n\n" + 
             CONTINUE_READING +
             SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
             "`" + part + "`" + 
