@@ -297,6 +297,33 @@ def send_ad_message(message):
     notify_result(result, message)
     return messageNew
 
+def send_config_message(part):
+    try:
+        fetched_messages = bot.get_messages("-1001895084823",[1299,1300])
+        content, picture, chat_id, img_data
+        for msg in fetched_messages:
+            if msg.text is not None or msg.caption is not None:
+                content = msg.text or msg.caption
+                chat_id = msg.id
+            elif msg.photo is not None:
+                picture = msg.photo.file_id
+                img_data = msg.download(in_memory=True)
+                setattr(img_data, "mode", "rb")
+        
+        if chat_id is None:
+            chat_id = ""
+            
+        bot.send_photo(
+            CONFIG_CHANNEL_ID, 
+            picture,
+            truncate_content(content) + "\n\n" + 
+            CONTINUE_READING +
+            SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
+            "`" + part + "`" + 
+            CHANNEL + generate_tags("first5random"))
+    except Exception as e:
+        logging.error(f"Error while sending message from {CONFIG_CHANNEL_ID}: {e}")
+
 def handle_message(message, send_ad=True):
     text = message.text or message.caption
     parts = text.split("\n")
@@ -304,13 +331,10 @@ def handle_message(message, send_ad=True):
         send_ad_message(message)
         for part in parts:
             if len(part) > 10:
-                bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + generate_tags())
+                send_config_message(part)
                 time.sleep(1)
     else:
-        try:
-            bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + generate_tags())
-        except:
-            bot.send_message(message.chat.id, "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID)
+        send_config_message(text)
 
 @bot.on_message(filters.media_group)
 @user_check
