@@ -238,7 +238,7 @@ def auto_ad_message(message:types.Message):
         
         try:
             # https://t.me/FreeVPNHomes/324
-            fetched_message = bot.get_messages(CHANNEL_ID, 324)
+            fetched_message = bot.get_messages(CHANNEL_ID, 229)
             bot.forward_message(
                 GROUP_ID, 
                 fetched_message,
