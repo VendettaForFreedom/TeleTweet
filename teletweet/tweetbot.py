@@ -11,6 +11,8 @@ import logging
 import os
 import tempfile
 import time
+import json
+import random
 from datetime import timedelta
 from threading import Lock
 
@@ -34,7 +36,7 @@ from config import (
     GROUP_ID, 
     GROUP,
     GROUP_TOPIC_ID,
-    GROUP_AD_TOPIC_ID,
+    CHANNEL_AD_MESSAGE_ID,
     CHANNEL_URL,
     tweet_format
 )
@@ -235,19 +237,6 @@ def auto_ad_message(message:types.Message):
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
         
         time.sleep(1)
-        
-        try:
-            # https://t.me/FreeVPNHomes/324
-            fetched_message = bot.get_messages(CHANNEL_ID, 229)
-            bot.forward_message(
-                GROUP_ID, 
-                fetched_message,
-                reply_to_message_id = GROUP_AD_TOPIC_ID
-            )
-        except Exception as e:
-            logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
-        
-        time.sleep(1)
 
         try:
             bot.send_photo(
@@ -267,6 +256,18 @@ def auto_ad_message(message:types.Message):
             SOURCE_CHANNEL + f"{chat_id}" + "\n" +
             CHANNEL_URL + generate_tags(),
             [img_data])
+        
+        time.sleep(60)
+        
+        try:
+            # https://t.me/FreeVPNHomes/324
+            bot.forward_messages(
+                chat_id = GROUP_ID, 
+                from_chat_id = CHANNEL_ID,
+                message_ids = [CHANNEL_AD_MESSAGE_ID]
+            )
+        except Exception as e:
+            logging.error(f"Error while sending message from {CHANNEL_ID} to {GROUP_ID}: {e}")
 
 def send_ad_message(message):
     try:
@@ -314,30 +315,40 @@ def send_ad_message(message):
 def send_config_message(part):
     try:
         logging.info("fetched_messages before")
-        fetched_messages = bot.get_messages(SOURCE_CHANNEL_ID,[475,474])
+
+        # read a json file containing pair of message ids and randomly select one
+        selected_pair = None
+        with open('message_ids.json', 'r') as file:
+            message_ids = json.load(file)
+            # Randomly select one pair of message IDs
+            selected_pair = random.choice(message_ids)
+
         content, picture, chat_id, img_data = "", "", "", None
-        for msg in fetched_messages:
-            if msg.text is not None or msg.caption is not None:
-                content = msg.text or msg.caption
-                chat_id = msg.id
-            elif msg.photo is not None:
-                picture = msg.photo.file_id
-                img_data = msg.download(in_memory=True)
-                setattr(img_data, "mode", "rb")
+        if selected_pair is not None:
+            fetched_messages = bot.get_messages(SOURCE_CHANNEL_ID, selected_pair)
+            for msg in fetched_messages:
+                if msg.text is not None or msg.caption is not None:
+                    content = msg.text or msg.caption
+                    chat_id = msg.id
+                elif msg.photo is not None:
+                    picture = msg.photo.file_id
+                    img_data = msg.download(in_memory=True)
+                    setattr(img_data, "mode", "rb")
         
-        if chat_id is None:
-            chat_id = ""
-            
+        message_body = ""
+        if chat_id is not None:
+            message_body = truncate_content(content,300) + "\n\n" + CONTINUE_READING + \
+                SOURCE_CHANNEL + f"{chat_id}" + "\n\n"
+        
         bot.send_photo(
             CONFIG_CHANNEL_ID, 
             picture,
-            truncate_content(content,300) + "\n\n" + 
-            CONTINUE_READING +
-            SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
+            message_body + 
             "`" + part + "`" + 
             CHANNEL + generate_tags("first5random"))
+        
     except Exception as e:
-        logging.error(f"Error while sending message from {CONFIG_CHANNEL_ID}: {e}")
+        logging.error(f"Error while sending message to {CONFIG_CHANNEL_ID}: {e}")
 
 def handle_message(message, send_ad=True):
     text = message.text or message.caption

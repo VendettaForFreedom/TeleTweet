@@ -22,7 +22,7 @@ CHANNEL_ID = os.getenv("CHANNEL_ID", "")
 SOURCE_CHANNEL_ID = os.getenv("SOURCE_CHANNEL_ID", "")
 GROUP_ID = os.getenv("GROUP_ID", "")
 GROUP_TOPIC_ID = int(os.getenv("GROUP_TOPIC_ID", "0"))
-GROUP_AD_TOPIC_ID = int(os.getenv("GROUP_AD_TOPIC_ID", "0"))
+CHANNEL_AD_MESSAGE_ID = int(os.getenv("CHANNEL_AD_MESSAGE_ID", "0"))
 GROUP = os.getenv("GROUP", "")
 # AUTH_STRING = os.getenv("AUTH_STRING", "")
 
