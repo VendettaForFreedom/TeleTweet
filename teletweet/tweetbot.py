@@ -257,7 +257,7 @@ def auto_ad_message(message:types.Message):
             CHANNEL_URL + generate_tags(),
             [img_data])
         
-        time.sleep(60)
+        time.sleep(3600)
         
         try:
             # https://t.me/FreeVPNHomes/324
