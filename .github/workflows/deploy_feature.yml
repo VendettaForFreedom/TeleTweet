@@ -58,6 +58,7 @@ jobs:
           echo SOURCE_CHANNEL_ID=${{ secrets.SOURCE_CHANNEL_ID}} >> teletweet.env
           echo GROUP_ID=${{ secrets.GROUP_ID}} >> teletweet.env
           echo GROUP_TOPIC_ID=${{ secrets.GROUP_TOPIC_ID}} >> teletweet.env
+          echo GROUP_AD_TOPIC_ID=${{ secrets.GROUP_AD_TOPIC_ID}} >> teletweet.env
           echo GROUP=${{ secrets.GROUP}} >> teletweet.env
           echo ALLOW_USERS=${{ secrets.ALLOW_USER}} >> teletweet.env
           full_image_name="${{ steps.docker_build.outputs.full_image_name }}"

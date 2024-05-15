@@ -34,6 +34,7 @@ from config import (
     GROUP_ID, 
     GROUP,
     GROUP_TOPIC_ID,
+    GROUP_AD_TOPIC_ID,
     CHANNEL_URL,
     tweet_format
 )
@@ -235,6 +236,19 @@ def auto_ad_message(message:types.Message):
         
         time.sleep(1)
         
+        try:
+            # https://t.me/FreeVPNHomes/324
+            fetched_message = bot.get_messages(CHANNEL_ID, 324)
+            bot.forward_message(
+                GROUP_ID, 
+                fetched_message,
+                reply_to_message_id = GROUP_AD_TOPIC_ID
+            )
+        except Exception as e:
+            logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
+        
+        time.sleep(1)
+
         try:
             bot.send_photo(
                 GROUP_ID, 
