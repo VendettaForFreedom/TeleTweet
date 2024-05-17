@@ -253,12 +253,15 @@ def auto_ad_message(message:types.Message):
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
 
-        send_tweet(messageNew,
+        try:
+            send_tweet(messageNew,
             truncate_content(content, 100) + "\n" + 
             CONTINUE_READING +
             SOURCE_CHANNEL + f"{chat_id}" + "\n" +
             CHANNEL_URL + generate_tags(),
             [img_data])
+        except Exception as e:
+            logging.error(f"Error while sending tweet from {CHANNEL_ID}: {e}")
         
         time.sleep(3600)
         
@@ -317,8 +320,6 @@ def send_ad_message(message):
 
 def send_config_message(part):
     try:
-        logging.info("fetched_messages before")
-
         # read message_id_pairs from file randomly
         # Open and read the text file
         with open('message_id_pairs.txt', 'r') as file:
@@ -328,6 +329,7 @@ def send_config_message(part):
         selected_pair = random.choice(message_id_pairs)
         logging.info("selected_pair: %s", selected_pair)
 
+        logging.info("fetched_messages before")
         content, picture, chat_id, img_data = "", "", "", None
         if selected_pair is not None:
             fetched_messages = bot.get_messages(SOURCE_REPOSITORY_CHANNEL_ID, selected_pair)
@@ -339,6 +341,7 @@ def send_config_message(part):
                     picture = msg.photo.file_id
                     img_data = msg.download(in_memory=True)
                     setattr(img_data, "mode", "rb")
+        logging.info("fetched_messages after")
         
         message_body = ""
         if chat_id is not None:
