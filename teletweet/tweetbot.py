@@ -253,12 +253,15 @@ def auto_ad_message(message:types.Message):
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
 
-        send_tweet(messageNew,
+        try:
+            send_tweet(messageNew,
             truncate_content(content, 100) + "\n" + 
             CONTINUE_READING +
             SOURCE_CHANNEL + f"{chat_id}" + "\n" +
             CHANNEL_URL + generate_tags(),
             [img_data])
+        except Exception as e:
+            logging.error(f"Error while sending tweet from {CHANNEL_ID}: {e}")
         
         time.sleep(3600)
         
