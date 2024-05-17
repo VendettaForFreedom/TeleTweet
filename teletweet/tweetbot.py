@@ -26,6 +26,7 @@ from config import (
     CONFIG_CHANNEL_ID, 
     CHANNEL_ID, 
     SOURCE_CHANNEL_ID,
+    SOURCE_REPOSITORY_CHANNEL_ID,
     ALLOW_USERS, 
     FEEDBACK, 
     TODAY_CONFIG, 
@@ -178,6 +179,8 @@ def truncate_content(content, limit=500):
 
 def is_multi_message(message):
     time_difference = message.date - Multi_message[SOURCE_CHANNEL_ID].date
+    if time_difference.total_seconds() < 0:
+        time_difference = -time_difference
     return time_difference < timedelta(minutes=5)
 
 def auto_ad_message(message:types.Message):
@@ -316,20 +319,22 @@ def send_config_message(part):
     try:
         logging.info("fetched_messages before")
 
-        # read a json file containing pair of message ids and randomly select one
-        selected_pair = None
-        with open('message_ids.json', 'r') as file:
-            message_ids = json.load(file)
-            # Randomly select one pair of message IDs
-            selected_pair = random.choice(message_ids)
+        # read message_id_pairs from file randomly
+        # Open and read the text file
+        with open('message_id_pairs.txt', 'r') as file:
+            message_id_pairs = [list(map(int, line.strip().split())) for line in file.readlines()]
+
+        # Randomly select one pair of message IDs
+        selected_pair = random.choice(message_id_pairs)
+        logging.info("selected_pair: %s", selected_pair)
 
         content, picture, chat_id, img_data = "", "", "", None
         if selected_pair is not None:
-            fetched_messages = bot.get_messages(SOURCE_CHANNEL_ID, selected_pair)
+            fetched_messages = bot.get_messages(SOURCE_REPOSITORY_CHANNEL_ID, selected_pair)
             for msg in fetched_messages:
                 if msg.text is not None or msg.caption is not None:
                     content = msg.text or msg.caption
-                    chat_id = msg.id
+                    chat_id = msg.forward_from_message_id
                 elif msg.photo is not None:
                     picture = msg.photo.file_id
                     img_data = msg.download(in_memory=True)
