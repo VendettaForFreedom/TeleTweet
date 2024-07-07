@@ -215,7 +215,7 @@ def auto_ad_message(message:types.Message):
             channel_message = bot.get_messages(CHANNEL_ID, CHANNEL_AD_MESSAGE_ID)
             stop_string = CHANNEL
             if stop_string in channel_message.text:
-                channel_message.text = channel_message.text.split(stop_string)[0]
+                channel_message.text = channel_message.text.split(stop_string)[0] + stop_string
             messageNew = bot.send_photo(
                 CHANNEL_ID, 
                 picture,
