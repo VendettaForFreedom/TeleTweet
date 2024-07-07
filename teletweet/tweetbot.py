@@ -67,7 +67,7 @@ def start_handler(client, message: types.Message):
     if get_auth_data(message.chat.id):
         bot.send_message(message.chat.id, "Start by sending me a message?")
         return
-    msg = "Welcome to TeleTweet. " "This bot will connect you from Telegram Bot to Twitter. "
+    msg = "Welcome to Config-Distributor. " "This bot will connect you from Telegram Bot to Twitter "
     if ALLOW_USERS != [""]:
         msg += "\n\nTHIS BOT IS ONLY AVAILABLE TO CERTAIN USERS. Contact creator for help."
     bot.send_message(message.chat.id, msg)
@@ -211,13 +211,20 @@ def auto_ad_message(message:types.Message):
         img_data = None 
         try:
             del Multi_message[SOURCE_CHANNEL_ID]
+            # https://t.me/FreeVPNHomes/324
+            channel_message = bot.get_messages(CHANNEL_ID, CHANNEL_AD_MESSAGE_ID)
+            stop_string = CHANNEL
+            if stop_string in channel_message.text:
+                channel_message.text = channel_message.text.split(stop_string)[0]
             messageNew = bot.send_photo(
                 CHANNEL_ID, 
                 picture,
-                truncate_content(content) + "\n\n" + 
+                truncate_content(content,300) + "\n\n" + 
                 CONTINUE_READING +
-                SOURCE_CHANNEL + f"{chat_id}" + "\n" +
-                CHANNEL + generate_tags("first5random")
+                SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
+                # contains everything except tags
+                channel_message.text + "\n\n" +
+                generate_tags("first5random")
             )
             img_data = messageNew.download(in_memory=True)
             setattr(img_data, "mode", "rb")
@@ -347,7 +354,7 @@ def send_config_message(part):
         if chat_id is not None:
             message_body = truncate_content(content,300) + "\n\n" + CONTINUE_READING + \
                 SOURCE_CHANNEL + f"{chat_id}" + "\n\n"
-        
+    
         bot.send_photo(
             CONFIG_CHANNEL_ID, 
             picture,
