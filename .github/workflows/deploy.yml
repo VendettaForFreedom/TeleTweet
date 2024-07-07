@@ -61,7 +61,7 @@ jobs:
           fi
 
   build_n_deploy:
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     needs: versioning
 
     runs-on: ubuntu-latest
