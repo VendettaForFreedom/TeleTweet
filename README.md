@@ -1,7 +1,7 @@
-# Teletweet Project
+# Config-Distributor Project
 
 ## Introduction
-Teletweet seamlessly connects Telegram with Twitter, empowering users to manage their Twitter feed, post tweets, and interact with their audience directly through Telegram. This integration is facilitated by a sophisticated Telegram bot, built on Python, which handles Twitter operations securely and efficiently.
+Config-Distributor seamlessly connects Telegram with Twitter, empowering admins to distribute vpn configs to different telegram channels and group as well twitter. This integration is facilitated by a sophisticated Telegram bot, built on Python, which handles Twitter operations securely and efficiently.
 
 ## Features
 - **Direct Twitter Integration**: Link your Twitter account with Telegram for direct tweeting, retweeting, and more.
