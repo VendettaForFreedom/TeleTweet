@@ -82,6 +82,13 @@ jobs:
           echo ${latest_tag}
           echo "latest_tag=${latest_tag}" >> $GITHUB_OUTPUT
 
+      - name: remove old images
+        if: success() && steps.deploy_to_server.outcome == 'success'
+        run: |
+          image_name=${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE }}
+          scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r .ci_utils/cleanup_old_images.sh "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet_dev/
+          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet_dev && /bin/bash cleanup_old_images.sh ${image_name}"
+
       - name: Build and Push Docker Image
         id: docker_build
         run: |
@@ -151,13 +158,6 @@ jobs:
           echo "the deployement is done"
           ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet_dev && docker compose ps"
           echo done with all the steps
-
-      - name: remove old images
-        if: success() && steps.deploy_to_server.outcome == 'success'
-        run: |
-          image_name=${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.DOCKER_IMAGE }}
-          scp -i ./private.key -P "${{ secrets.DEPLOYMENT_PORT }}" -r .ci_utils/cleanup_old_images.sh "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}":~/teletweet_dev/
-          ssh -i ./private.key -p "${{ secrets.DEPLOYMENT_PORT }}" "${{ secrets.DEPLOY_USER}}"@"${{ secrets.INSTANCE_IP }}" "cd ~/teletweet_dev && /bin/bash cleanup_old_images.sh ${image_name}"
 
       - name: remove ssh folder
         run: |
