@@ -21,5 +21,7 @@ TAGS_TO_DELETE=$(echo "$TAGS" | tail -n +$(($KEEP + 1)))
 echo tags_to_delete: $TAGS_TO_DELETE
 for tag in $TAGS_TO_DELETE; do
     echo "Removing image: $tag"
-    docker rmi "$tag"
+    # docker rmi 
 done
+
+docker rmi $(docker images -q)

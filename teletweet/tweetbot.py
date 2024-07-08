@@ -11,6 +11,8 @@ import logging
 import os
 import tempfile
 import time
+import json
+import random
 from datetime import timedelta
 from threading import Lock
 
@@ -24,6 +26,7 @@ from config import (
     CONFIG_CHANNEL_ID, 
     CHANNEL_ID, 
     SOURCE_CHANNEL_ID,
+    SOURCE_REPOSITORY_CHANNEL_ID,
     ALLOW_USERS, 
     FEEDBACK, 
     TODAY_CONFIG, 
@@ -34,6 +37,7 @@ from config import (
     GROUP_ID, 
     GROUP,
     GROUP_TOPIC_ID,
+    CHANNEL_AD_MESSAGE_ID,
     CHANNEL_URL,
     tweet_format
 )
@@ -63,7 +67,7 @@ def start_handler(client, message: types.Message):
     if get_auth_data(message.chat.id):
         bot.send_message(message.chat.id, "Start by sending me a message?")
         return
-    msg = "Welcome to TeleTweet. " "This bot will connect you from Telegram Bot to Twitter. "
+    msg = "Welcome to Config-Distributor. " "This bot will connect you from Telegram Bot to Twitter "
     if ALLOW_USERS != [""]:
         msg += "\n\nTHIS BOT IS ONLY AVAILABLE TO CERTAIN USERS. Contact creator for help."
     bot.send_message(message.chat.id, msg)
@@ -175,6 +179,8 @@ def truncate_content(content, limit=500):
 
 def is_multi_message(message):
     time_difference = message.date - Multi_message[SOURCE_CHANNEL_ID].date
+    if time_difference.total_seconds() < 0:
+        time_difference = -time_difference
     return time_difference < timedelta(minutes=5)
 
 def auto_ad_message(message:types.Message):
@@ -205,13 +211,20 @@ def auto_ad_message(message:types.Message):
         img_data = None 
         try:
             del Multi_message[SOURCE_CHANNEL_ID]
+            # https://t.me/FreeVPNHomes/324
+            channel_message = bot.get_messages(CHANNEL_ID, CHANNEL_AD_MESSAGE_ID)
+            stop_string = CHANNEL
+            if stop_string in channel_message.text:
+                channel_message.text = channel_message.text.split(stop_string)[0] + stop_string
             messageNew = bot.send_photo(
                 CHANNEL_ID, 
                 picture,
-                truncate_content(content) + "\n\n" + 
+                truncate_content(content,300) + "\n\n" + 
                 CONTINUE_READING +
-                SOURCE_CHANNEL + f"{chat_id}" + "\n" +
-                CHANNEL + generate_tags("first5random")
+                SOURCE_CHANNEL + f"{chat_id}" + "\n\n" +
+                # contains everything except tags
+                channel_message.text + "\n\n" +
+                generate_tags("first5random")
             )
             img_data = messageNew.download(in_memory=True)
             setattr(img_data, "mode", "rb")
@@ -234,7 +247,7 @@ def auto_ad_message(message:types.Message):
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
         
         time.sleep(1)
-        
+
         try:
             bot.send_photo(
                 GROUP_ID, 
@@ -247,12 +260,27 @@ def auto_ad_message(message:types.Message):
         except Exception as e:
             logging.error(f"Error while sending message from {message.chat.id} to {GROUP_ID}: {e}")
 
-        send_tweet(messageNew,
+        try:
+            send_tweet(messageNew,
             truncate_content(content, 100) + "\n" + 
             CONTINUE_READING +
             SOURCE_CHANNEL + f"{chat_id}" + "\n" +
             CHANNEL_URL + generate_tags(),
             [img_data])
+        except Exception as e:
+            logging.error(f"Error while sending tweet from {CHANNEL_ID}: {e}")
+        
+        time.sleep(3600)
+        
+        try:
+            # https://t.me/FreeVPNHomes/324
+            bot.forward_messages(
+                chat_id = GROUP_ID, 
+                from_chat_id = CHANNEL_ID,
+                message_ids = [CHANNEL_AD_MESSAGE_ID]
+            )
+        except Exception as e:
+            logging.error(f"Error while sending message from {CHANNEL_ID} to {GROUP_ID}: {e}")
 
 def send_ad_message(message):
     try:
@@ -297,6 +325,46 @@ def send_ad_message(message):
     notify_result(result, message)
     return messageNew
 
+def send_config_message(part):
+    try:
+        # read message_id_pairs from file randomly
+        # Open and read the text file
+        with open('message_id_pairs.txt', 'r') as file:
+            message_id_pairs = [list(map(int, line.strip().split())) for line in file.readlines()]
+
+        # Randomly select one pair of message IDs
+        selected_pair = random.choice(message_id_pairs)
+        logging.info("selected_pair: %s", selected_pair)
+
+        logging.info("fetched_messages before")
+        content, picture, chat_id, img_data = "", "", "", None
+        if selected_pair is not None:
+            fetched_messages = bot.get_messages(SOURCE_REPOSITORY_CHANNEL_ID, selected_pair)
+            for msg in fetched_messages:
+                if msg.text is not None or msg.caption is not None:
+                    content = msg.text or msg.caption
+                    chat_id = msg.forward_from_message_id
+                elif msg.photo is not None:
+                    picture = msg.photo.file_id
+                    img_data = msg.download(in_memory=True)
+                    setattr(img_data, "mode", "rb")
+        logging.info("fetched_messages after")
+        
+        message_body = ""
+        if chat_id is not None:
+            message_body = truncate_content(content,300) + "\n\n" + CONTINUE_READING + \
+                SOURCE_CHANNEL + f"{chat_id}" + "\n\n"
+    
+        bot.send_photo(
+            CONFIG_CHANNEL_ID, 
+            picture,
+            message_body + 
+            "`" + part + "`" + 
+            CHANNEL + generate_tags("first5random"))
+        
+    except Exception as e:
+        logging.error(f"Error while sending message to {CONFIG_CHANNEL_ID}: {e}")
+
 def handle_message(message, send_ad=True):
     text = message.text or message.caption
     parts = text.split("\n")
@@ -304,13 +372,10 @@ def handle_message(message, send_ad=True):
         send_ad_message(message)
         for part in parts:
             if len(part) > 10:
-                bot.send_message(CONFIG_CHANNEL_ID, "`" + part + "`" + CHANNEL + generate_tags())
+                send_config_message(part)
                 time.sleep(1)
     else:
-        try:
-            bot.send_message(CONFIG_CHANNEL_ID, "`" + text + "`" + CHANNEL + generate_tags())
-        except:
-            bot.send_message(message.chat.id, "I can't send the message to the config channel:" + CONFIG_CHANNEL_ID)
+        send_config_message(text)
 
 @bot.on_message(filters.media_group)
 @user_check
