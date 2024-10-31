@@ -139,6 +139,13 @@ def config_handler(client, message: types.Message):
     bot.send_message(message.chat.id, "Send me a list of configs I send them with an ad.")
     STEP[message.chat.id] = "multiple_configs"
 
+@bot.on_message(filters.command(["all_in_one"]))
+@user_check
+def config_handler(client, message: types.Message):
+    message.reply_chat_action(enums.ChatAction.TYPING)
+    bot.send_message(message.chat.id, "Send me a list of configs I send them with an ad.")
+    STEP[message.chat.id] = "all_in_one"
+
 @bot.on_message(filters.incoming)
 @user_check
 def tweet_text_handler(client, message: types.Message):
@@ -163,10 +170,13 @@ def tweet_text_handler(client, message: types.Message):
         return
     
     if STEP.get(message.chat.id) == "single_config":
-        handle_message(message, False)
+        handle_message(message, False, False)
         STEP.pop(message.chat.id)
     elif STEP.get(message.chat.id) == "multiple_configs":
-        handle_message(message)
+        handle_message(message, True, True)
+        STEP.pop(message.chat.id)
+    elif STEP.get(message.chat.id) == "all_in_one":
+        handle_message(message, True, False)
         STEP.pop(message.chat.id)
     else:
         bot.send_message(message.chat.id, "Send me a command first.")
@@ -365,11 +375,12 @@ def send_config_message(part):
     except Exception as e:
         logging.error(f"Error while sending message to {CONFIG_CHANNEL_ID}: {e}")
 
-def handle_message(message, send_ad=True):
+def handle_message(message, send_ad=True, divide=True):
     text = message.text or message.caption
     parts = text.split("\n")
     if send_ad:
         send_ad_message(message)
+    if divide:
         for part in parts:
             if len(part) > 10:
                 send_config_message(part)
