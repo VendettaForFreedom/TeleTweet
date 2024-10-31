@@ -39,7 +39,8 @@ from config import (
     GROUP_TOPIC_ID,
     CHANNEL_AD_MESSAGE_ID,
     CHANNEL_URL,
-    tweet_format
+    tweet_format,
+    tweet_length
 )
 
 from helper import get_auth_data, sign_in, sign_off
@@ -262,7 +263,7 @@ def auto_ad_message(message:types.Message):
 
         try:
             send_tweet(messageNew,
-            truncate_content(content, 100) + "\n" + 
+            truncate_content(content, tweet_length) + "\n" + 
             CONTINUE_READING +
             SOURCE_CHANNEL + f"{chat_id}" + "\n" +
             CHANNEL_URL + generate_tags(),
