@@ -51,7 +51,7 @@ After configuring `config.py` with your API keys and other settings, run `tweetb
 We encourage contributions to the Teletweet project. If you've identified a bug, have suggestions for improvements, or want to add new features, please fork the repository, make your changes, and submit a pull request.
 
 - We have deployment on feature-* branches that has an open pull request with build tag
-- Production deployment when there is a merge on deployment branch
+- Production deployment when there is a new commit on deployment branch
 
 ## License
 GPL 2.0__
